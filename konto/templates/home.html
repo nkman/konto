@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>përpilues</title>
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home.css')}}">
+		<script src="{{ url_for('static', filename='js/home.js')}}"></script>
+	</head>
+	<body>		
+		<div class="home-top-header">
+			<div class="top-links">
+				<span><a href="#" onclick="login()">login</a></span>
+				&nbsp;&nbsp;&nbsp;<span><a href="#" onclick="signup()">signup</a></span>
+			</div>
+		</div>
+		<div class="home-top">
+			<div class="form">
+				<div id="signup-form">
+					<form method="post" action="/signup">
+						<input id="login" type="text" name="firstname" placeholder="First Name"></br></br>
+						<input id="login" type="text" name="lastname" placeholder="Last Name" size=30></br></br>
+						<input id="login" type="text" name="phone" placeholder="phone" size=30></br></br>
+						<input id="login" type="text" name="username" placeholder="username" size=30></br></br>
+						<input id="login" type="password" name="password" placeholder="password" size=30></br></br>
+						<input id="signup-button" type="submit" value="signup" name="signup"></br>
+					</form>
+				</div>
+				<div id="login-form">
+					<form method="post" action="/user/login">
+						<input id="login" type="text" name="username" placeholder="username" size=30></br></br>
+						<input id="login" type="password" name="password" placeholder="password" size=30></br></br>
+						<input id="signup-button" type="submit" value="login" name="login"></br>
+					</form>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

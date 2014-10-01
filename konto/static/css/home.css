@@ -1,0 +1,35 @@
+.home-top-header{
+	height: 40px;
+	background-color: rgb(123, 252, 221);
+}
+
+.top-links{
+	position: relative;
+	top: 10px;
+	margin-left: auto;
+	text-align: left;
+	width: 200px;
+}
+
+.form{
+	position: relative;
+	top: 100px;
+	margin-left: auto;
+	width: 400px;
+}
+
+#login{
+	height: 30px;
+	width: 350px;
+}
+
+#signup-button{
+	height: 30px;
+	width: 90px;
+}
+
+#login-form{
+	position: relative;
+	top: -300px;
+	visibility: hidden;
+}

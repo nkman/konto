@@ -12,8 +12,6 @@ Five Tables:
         userId: (taken from User table)
         firstname:
         lastname:
-        bhawan:
-        roomno:
 
     3. Account -> Contains user account details:
         accountId: (it will generate here)
@@ -82,8 +80,6 @@ class Database:
         userId: (taken from User table)
         firstname:
         lastname:
-        bhawan:
-        roomno:
         """
 
         query = """
@@ -92,8 +88,7 @@ class Database:
                     userId varchar(20) NOT NULL,
                     firstname varchar(20) NOT NULL,
                     lastname varchar(20) NOT NULL,
-                    bhawan varchar(20) NOT NULL,
-                    roomno varchar(20) NOT NULL,
+                    phone varchar(20),
                     date_added timestamp default NULL
                 );
         """
@@ -199,3 +194,22 @@ class Database:
 
         return 1
 
+    def create_address(self, user):
+
+        username = user['username']
+        firstname = user['firstname']
+        lastname = user['lastname']
+        bhawan = user['bhawan']
+        roomno = user['roomno']
+
+        query = 'SELECT userId FROM users WHERE username=%s' % username
+        cursor = self.connection.cursor()
+
+        try:
+            cursor.execute(query)
+        except Exception, e:
+            print e
+            return e #how to handle this -> rollbacks ?
+
+        userId = cursor.fetchone()
+        print userId
