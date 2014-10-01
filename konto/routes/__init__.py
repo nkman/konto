@@ -4,7 +4,7 @@ from flask import make_response
 
 import config
 import uuid
-import jsontree
+import jsontree, json
 
 from db import database
 
@@ -55,8 +55,7 @@ def signup():
     if(user.phone == ''):
         user.phone = None
 
-    con.create_user(user)
-    return "Created User"
+    return json.dumps(con.create_user(user))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

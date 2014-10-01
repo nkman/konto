@@ -72,11 +72,16 @@ class Database:
         """
 
         cursor = self.connection.cursor()
+        conn = self.connection
 
         try:
             cursor.execute(query)
+            conn.commit()
             print "created table users\n"
+            cursor.close()
+
         except Exception, e:
+            cursor.close()
             raise e
 
     def address_table(self):
@@ -91,7 +96,7 @@ class Database:
                 CREATE TABLE IF NOT EXISTS address (
                     id bigserial primary key,
                     addressId varchar(36) NOT NULL,
-                    userId varchar(20) NOT NULL,
+                    userId varchar(36) NOT NULL,
                     firstname varchar(20) NOT NULL,
                     lastname varchar(20) NOT NULL,
                     phone varchar(20) default NULL,
@@ -101,11 +106,16 @@ class Database:
         """
 
         cursor = self.connection.cursor()
+        conn = self.connection
 
         try:
             cursor.execute(query)
+            conn.commit()
             print "created table address\n"
+            cursor.close()
+
         except Exception, e:
+            cursor.close()
             raise e
 
     def account_table(self):
@@ -124,8 +134,8 @@ class Database:
                 CREATE TABLE IF NOT EXISTS account (
                     id bigserial primary key,
                     accountId varchar(36) NOT NULL,
-                    userId1 varchar(20) NOT NULL,
-                    userId2 varchar(20) NOT NULL,
+                    userId1 varchar(36) NOT NULL,
+                    userId2 varchar(36) NOT NULL,
                     balance int,
                     is_positive boolean,
                     confirmed_by_user1 boolean,
@@ -136,11 +146,16 @@ class Database:
         """
 
         cursor = self.connection.cursor()
+        conn = self.connection
 
         try:
             cursor.execute(query)
+            conn.commit()
             print "created table account\n"
+            cursor.close()
+
         except Exception, e:
+            cursor.close()
             raise e
 
 
@@ -159,7 +174,7 @@ class Database:
                     midId varchar(36) NOT NULL,
                     made_by varchar(20),
                     made_to varchar(20),
-                    accountId varchar(20),
+                    accountId varchar(36),
                     constraint u_constrainte5 unique (accountId)
                 );
         """
@@ -171,9 +186,14 @@ class Database:
             cursor.execute(query)
             conn.commit()
             print "created table mid\n"
+            cursor.close()
+
         except Exception, e:
+            cursor.close()
             raise e
 
+    def close_connection(self):
+        self.connection.close()
 
     def user_found(self, username):
 
@@ -183,10 +203,12 @@ class Database:
         cursor.execute(query)
 
         result = cursor.fetchone()
+        cursor.close()
 
         if (result == None):
             return 0
         else:
+            print "Username exists"
             return 1
 
 
@@ -195,7 +217,7 @@ class Database:
         username = user['username']
         password = user['password']
 
-        if(self.user_found(username) != ''):
+        if(self.user_found(username) == 1):
             msg = jsontree.jsontree()
             msg.status = 0
             msg.message = "username exists !!"
@@ -213,24 +235,30 @@ class Database:
         msg = jsontree.jsontree()
 
         try:
-            cursor.execute(query)
+            cursor.execute(query)   
             conn.commit()
+            print "New user created"
+            cursor.close()
 
         except Exception, e:
+            cursor.close()
             msg.status = 0
             msg.message = "user creation failed !!"
             return msg
 
         try:
-            self.create_address(user)
+            msg = self.create_address(user)
 
         except Exception, e:
             msg.status = 0
             msg.message = "user address creation failed !!"
             return msg
 
-        msg.status = 1
-        msg.message = "user and user address created successfully !!"
+        if (msg.status == 1):
+            msg.message = "user and user address created successfully !!"
+        else:
+            msg.message = "user created but adderss creation failed !!"
+            #delete_created_user()
 
         return msg
 
@@ -240,8 +268,6 @@ class Database:
         firstname = user['firstname']
         lastname = user['lastname']
         phone = user['phone']
-        # bhawan = user['bhawan']
-        # roomno = user['roomno']
 
         _id = uuid.uuid1()
 
@@ -252,25 +278,39 @@ class Database:
         cursor = self.connection.cursor()
         conn = self.connection
 
+        msg = jsontree.jsontree()
+
         try:
             cursor.execute(query)
         except Exception, e:
-            print e
-            return e #how to handle this -> rollbacks ?
+            msg.status = 0
+            # msg.message = "Unable to commit create address query !!"
+            msg.message = str(e)
+            return msg #how to handle this -> rollbacks ?
 
         userId = cursor.fetchone()[0]
+        cursor.close()
 
         query = """
             INSERT INTO address(addressId, userId, firstname, lastname, phone)
             VALUES (\'%s\', \'%s\', \'%s\', \'%s\', \'%s\')
         """ % (str(_id), userId, firstname, lastname, phone)
 
-        cursor = self.connection.cursor()
+        cursor = conn.cursor()
 
         try:
             cursor.execute(query)
             conn.commit()
+            print "New adderss created !"
+            cursor.close()
+            msg.status = 1
+            msg.message = "whatever"
+            return msg
 
         except Exception, e:
+            cursor.close()
+            msg.status = 0
+            # msg.message = "Unable to commit create address query !!"
             print e
-            return e
+            msg.message = str(e)
+            return msg #how to handle this -> rollbacks ?
