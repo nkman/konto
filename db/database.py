@@ -2,7 +2,7 @@ import os
 import psycopg2
 
 """
-Four Tables:
+Five Tables:
     1. Users -> Contains user details:
         userId: (it will generate here)
         username:
@@ -29,7 +29,12 @@ Four Tables:
         made_to: userId
         approved: boolean (will be approved by made_to user)
 
+    5. Cokiees -> sessions
+        userId: 
+        cookie:
+
 """
+
 class Database:
 
     def __init__(self, config):
@@ -53,13 +58,14 @@ class Database:
         username:
         password:
         """
-        
+
         query = """
-                CREATE TABLE users (
+                CREATE TABLE IF NOT EXISTS sers (
                     userId bigserial primary key,
                     username varchar(20) NOT NULL,
                     password varchar(20) NOT NULL,
-                    date_added timestamp default NULL
+                    date_added timestamp default NULL,
+                    constraint u_constrainte unique (username)
                 );
         """
 
@@ -81,7 +87,7 @@ class Database:
         """
 
         query = """
-                CREATE TABLE address (
+                CREATE TABLE IF NOT EXISTS address (
                     addressId bigserial primary key,
                     userId varchar(20) NOT NULL,
                     firstname varchar(20) NOT NULL,
@@ -99,6 +105,65 @@ class Database:
         except Exception, e:
             raise e
 
+    def account_table(self):
+
+        """
+        accountId: (it will generate here)
+        userId1: (taken from User table)
+        userId2: (taken from User table)
+        balance:
+        is_positive: boolean (if positive => 2 owes 1)
+        confirmed_by_user1: boolean
+        confirmed_by_user2: boolean
+        """
+
+        query = """
+                CREATE TABLE IF NOT EXISTS account (
+                    accountId bigserial primary key,
+                    userId1 varchar(20) NOT NULL,
+                    userId2 varchar(20) NOT NULL,
+                    balance int,
+                    is_positive boolean,
+                    confirmed_by_user1 boolean,
+                    confirmed_by_user2 boolean,
+                    date_added timestamp default NULL
+                );
+        """
+
+        cursor = self.connection.cursor()
+
+        try:
+            cursor.execute(query)
+        except Exception, e:
+            raise e
+
+
+    def Med_table(self):
+
+        """
+        made_by: userId
+        made_to: userId
+        approved: boolean (will be approved by made_to user)
+        accountId: 
+        """
+
+        query = """
+                CREATE TABLE IF NOT EXISTS mid (
+                    midId bigserial primary key,
+                    made_by varchar(20),
+                    made_to varchar(20),
+                    accountId varchar(20)
+                );
+        """
+
+        cursor = self.connection.cursor()
+
+        try:
+            cursor.execute(query)
+        except Exception, e:
+            raise e
+
+
     def user_found(self, username):
 
         query = 'SELECT * FROM User WHERE username=%s' % username
@@ -115,11 +180,22 @@ class Database:
 
 
     def create_user(self, user):
+
         username = user['username']
         password = user['password']
 
         if(user_found(username)):
             return 0
 
-        query = 'INSERT INTO User VALUE'
-        self.cursor = self.connection.cursor()
+        query = 'INSERT INTO users(username, password) VALUES (%s, %s)' % username, password
+
+        cursor = self.connection.cursor()
+
+        try:
+            cursor.execute(query)
+        except Exception, e:
+            print e
+            return e
+
+        return 1
+

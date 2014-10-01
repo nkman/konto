@@ -6,7 +6,7 @@ DB_PATH = os.path.join(os.path.dirname(__file__), 'db.json')
 def config():
     config_file = os.path.abspath(DB_PATH)
     
-    with open(_file, 'r') as f:
+    with open(config_file, 'r') as f:
         config = f.read()
         f.close()
 
