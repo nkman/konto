@@ -1,5 +1,6 @@
 import os
 import psycopg2
+import uuid
 
 """
 Five Tables:
@@ -58,12 +59,14 @@ class Database:
         """
 
         query = """
-                CREATE TABLE IF NOT EXISTS sers (
-                    userId bigserial primary key,
+                CREATE TABLE IF NOT EXISTS users (
+                    id bigserial primary key,
                     username varchar(20) NOT NULL,
                     password varchar(20) NOT NULL,
                     date_added timestamp default NULL,
-                    constraint u_constrainte unique (username)
+                    userId varchar(36) NOT NULL,
+                    constraint u_constrainte1 unique (username),
+                    constraint u_constrainte2 unique (userId)
                 );
         """
 
@@ -71,6 +74,7 @@ class Database:
 
         try:
             cursor.execute(query)
+            print "created table users\n"
         except Exception, e:
             raise e
 
@@ -84,12 +88,14 @@ class Database:
 
         query = """
                 CREATE TABLE IF NOT EXISTS address (
-                    addressId bigserial primary key,
+                    id bigserial primary key,
+                    addressId varchar(36) NOT NULL,
                     userId varchar(20) NOT NULL,
                     firstname varchar(20) NOT NULL,
                     lastname varchar(20) NOT NULL,
                     phone varchar(20),
-                    date_added timestamp default NULL
+                    date_added timestamp default NULL,
+                    constraint u_constrainte3 unique (addressId)
                 );
         """
 
@@ -97,6 +103,7 @@ class Database:
 
         try:
             cursor.execute(query)
+            print "created table address\n"
         except Exception, e:
             raise e
 
@@ -114,14 +121,16 @@ class Database:
 
         query = """
                 CREATE TABLE IF NOT EXISTS account (
-                    accountId bigserial primary key,
+                    id bigserial primary key,
+                    accountId varchar(36) NOT NULL,
                     userId1 varchar(20) NOT NULL,
                     userId2 varchar(20) NOT NULL,
                     balance int,
                     is_positive boolean,
                     confirmed_by_user1 boolean,
                     confirmed_by_user2 boolean,
-                    date_added timestamp default NULL
+                    date_added timestamp default NULL,
+                    constraint u_constrainte4 unique (accountId)
                 );
         """
 
@@ -129,6 +138,7 @@ class Database:
 
         try:
             cursor.execute(query)
+            print "created table account\n"
         except Exception, e:
             raise e
 
@@ -144,10 +154,12 @@ class Database:
 
         query = """
                 CREATE TABLE IF NOT EXISTS mid (
-                    midId bigserial primary key,
+                    id bigserial primary key,
+                    midId varchar(36) NOT NULL,
                     made_by varchar(20),
                     made_to varchar(20),
-                    accountId varchar(20)
+                    accountId varchar(20),
+                    constraint u_constrainte5 unique (accountId)
                 );
         """
 
@@ -155,6 +167,7 @@ class Database:
 
         try:
             cursor.execute(query)
+            print "created table mid\n"
         except Exception, e:
             raise e
 
@@ -182,7 +195,10 @@ class Database:
         if(user_found(username)):
             return 0
 
-        query = 'INSERT INTO users(username, password) VALUES (%s, %s)' % username, password
+        _id = uuid.uuid1()
+        query = """
+            INSERT INTO users(username, password, userId) VALUES (%s, %s, %s)
+        """ % username, password, str(_id)
 
         cursor = self.connection.cursor()
 
@@ -202,7 +218,12 @@ class Database:
         bhawan = user['bhawan']
         roomno = user['roomno']
 
-        query = 'SELECT userId FROM users WHERE username=%s' % username
+        _id = uuid.uuid1()
+
+        query = """
+            SELECT userId FROM users WHERE username=%s
+        """ % username
+
         cursor = self.connection.cursor()
 
         try:
