@@ -10,6 +10,7 @@ from db import database
 
 configuration = config.config()
 con = database.Database(configuration)
+con.connect()
 
 @app.route('/')
 
@@ -51,7 +52,11 @@ def signup():
     elif(user.lastname == ''):
         return "Some credentials missing"
 
-    return "LOL"
+    if(user.phone == ''):
+        user.phone = None
+
+    con.create_user(user)
+    return "Created User"
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

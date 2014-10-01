@@ -1,6 +1,7 @@
 import os
 import psycopg2
 import uuid
+import jsontree
 
 """
 Five Tables:
@@ -93,7 +94,7 @@ class Database:
                     userId varchar(20) NOT NULL,
                     firstname varchar(20) NOT NULL,
                     lastname varchar(20) NOT NULL,
-                    phone varchar(20),
+                    phone varchar(20) default NULL,
                     date_added timestamp default NULL,
                     constraint u_constrainte3 unique (addressId)
                 );
@@ -164,9 +165,11 @@ class Database:
         """
 
         cursor = self.connection.cursor()
+        conn = self.connection
 
         try:
             cursor.execute(query)
+            conn.commit()
             print "created table mid\n"
         except Exception, e:
             raise e
@@ -174,14 +177,14 @@ class Database:
 
     def user_found(self, username):
 
-        query = 'SELECT * FROM User WHERE username=%s' % username
+        query = 'SELECT * FROM users WHERE username=\'%s\'' % username
 
         cursor = self.connection.cursor()
         cursor.execute(query)
 
         result = cursor.fetchone()
 
-        if (len(result) == 0):
+        if (result == None):
             return 0
         else:
             return 1
@@ -192,39 +195,62 @@ class Database:
         username = user['username']
         password = user['password']
 
-        if(user_found(username)):
-            return 0
+        if(self.user_found(username) != ''):
+            msg = jsontree.jsontree()
+            msg.status = 0
+            msg.message = "username exists !!"
+            return msg
 
         _id = uuid.uuid1()
         query = """
-            INSERT INTO users(username, password, userId) VALUES (%s, %s, %s)
-        """ % username, password, str(_id)
+            INSERT INTO users(username, password, userId)
+            VALUES (\'%s\', \'%s\', \'%s\')
+        """ % (username, password, str(_id))
 
         cursor = self.connection.cursor()
+        conn = self.connection
+
+        msg = jsontree.jsontree()
 
         try:
             cursor.execute(query)
-        except Exception, e:
-            print e
-            return e
+            conn.commit()
 
-        return 1
+        except Exception, e:
+            msg.status = 0
+            msg.message = "user creation failed !!"
+            return msg
+
+        try:
+            self.create_address(user)
+
+        except Exception, e:
+            msg.status = 0
+            msg.message = "user address creation failed !!"
+            return msg
+
+        msg.status = 1
+        msg.message = "user and user address created successfully !!"
+
+        return msg
 
     def create_address(self, user):
 
         username = user['username']
         firstname = user['firstname']
         lastname = user['lastname']
-        bhawan = user['bhawan']
-        roomno = user['roomno']
+        phone = user['phone']
+        # bhawan = user['bhawan']
+        # roomno = user['roomno']
 
         _id = uuid.uuid1()
 
         query = """
-            SELECT userId FROM users WHERE username=%s
+            SELECT userId FROM users WHERE username=\'%s\'
         """ % username
 
         cursor = self.connection.cursor()
+        conn = self.connection
 
         try:
             cursor.execute(query)
@@ -232,5 +258,19 @@ class Database:
             print e
             return e #how to handle this -> rollbacks ?
 
-        userId = cursor.fetchone()
-        print userId
+        userId = cursor.fetchone()[0]
+
+        query = """
+            INSERT INTO address(addressId, userId, firstname, lastname, phone)
+            VALUES (\'%s\', \'%s\', \'%s\', \'%s\', \'%s\')
+        """ % (str(_id), userId, firstname, lastname, phone)
+
+        cursor = self.connection.cursor()
+
+        try:
+            cursor.execute(query)
+            conn.commit()
+
+        except Exception, e:
+            print e
+            return e

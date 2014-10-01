@@ -1,7 +1,7 @@
 import os
 import json
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'db.json')
+DB_PATH = os.path.join(os.path.dirname(__file__), 'db_local.json')
 
 def config():
     config_file = os.path.abspath(DB_PATH)
