@@ -1,7 +1,8 @@
-import os
+import os, sys
 import psycopg2
 import uuid
 import jsontree
+from datetime import datetime
 
 """
 Five Tables:
@@ -77,7 +78,7 @@ class Database:
         try:
             cursor.execute(query)
             conn.commit()
-            print "created table users\n"
+            sys.stdout.write("created table users\n")
             cursor.close()
 
         except Exception, e:
@@ -111,7 +112,7 @@ class Database:
         try:
             cursor.execute(query)
             conn.commit()
-            print "created table address\n"
+            sys.stdout.write("created table address\n")
             cursor.close()
 
         except Exception, e:
@@ -151,7 +152,7 @@ class Database:
         try:
             cursor.execute(query)
             conn.commit()
-            print "created table account\n"
+            sys.stdout.write("created table account\n")
             cursor.close()
 
         except Exception, e:
@@ -185,12 +186,19 @@ class Database:
         try:
             cursor.execute(query)
             conn.commit()
-            print "created table mid\n"
+            sys.stdout.write("created table mid\n")
             cursor.close()
 
         except Exception, e:
             cursor.close()
             raise e
+
+    def reset_connection(self):
+        sys.stdout.write("Closing the connection.\n")
+        self.connection.close()
+        sys.stdout.write("Connection closed\nStarting connection to database")
+        self.connect()
+        sys.stdout.write("Connection has been established.")
 
     def close_connection(self):
         self.connection.close()
@@ -208,7 +216,7 @@ class Database:
         if (result == None):
             return 0
         else:
-            print "Username exists"
+            sys.stdout.write("Username exists")
             return 1
 
 
@@ -224,10 +232,12 @@ class Database:
             return msg
 
         _id = uuid.uuid1()
+        date_added = datetime.now()
+
         query = """
-            INSERT INTO users(username, password, userId)
-            VALUES (\'%s\', \'%s\', \'%s\')
-        """ % (username, password, str(_id))
+            INSERT INTO users(username, password, userId, date_added)
+            VALUES (\'%s\', \'%s\', \'%s\', \'%s\')
+        """ % (username, password, str(_id), date_added)
 
         cursor = self.connection.cursor()
         conn = self.connection
@@ -237,10 +247,14 @@ class Database:
         try:
             cursor.execute(query)   
             conn.commit()
-            print "New user created"
+            sys.stdout.write("New user created")
             cursor.close()
 
         except Exception, e:
+            if (e == 'InternalError'):
+                self.reset_connection()
+
+            print e
             cursor.close()
             msg.status = 0
             msg.message = "user creation failed !!"
@@ -250,6 +264,9 @@ class Database:
             msg = self.create_address(user)
 
         except Exception, e:
+            if (e == 'InternalError'):
+                self.reset_connection()
+
             msg.status = 0
             msg.message = "user address creation failed !!"
             return msg
@@ -283,34 +300,41 @@ class Database:
         try:
             cursor.execute(query)
         except Exception, e:
+            if (e == 'InternalError'):
+                self.reset_connection()
+
             msg.status = 0
             # msg.message = "Unable to commit create address query !!"
             msg.message = str(e)
             return msg #how to handle this -> rollbacks ?
 
+        date_added = datetime.now()
         userId = cursor.fetchone()[0]
         cursor.close()
 
         query = """
-            INSERT INTO address(addressId, userId, firstname, lastname, phone)
-            VALUES (\'%s\', \'%s\', \'%s\', \'%s\', \'%s\')
-        """ % (str(_id), userId, firstname, lastname, phone)
+            INSERT INTO address(addressId, userId, firstname, lastname, phone, date_added)
+            VALUES (\'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%s\')
+        """ % (str(_id), userId, firstname, lastname, phone, date_added)
 
         cursor = conn.cursor()
 
         try:
             cursor.execute(query)
             conn.commit()
-            print "New adderss created !"
+            sys.stdout.write("New adderss created !")
             cursor.close()
             msg.status = 1
             msg.message = "whatever"
             return msg
 
         except Exception, e:
+            if (e == 'InternalError'):
+                self.reset_connection()
+
             cursor.close()
             msg.status = 0
             # msg.message = "Unable to commit create address query !!"
-            print e
+            sys.stdout.write(e)
             msg.message = str(e)
             return msg #how to handle this -> rollbacks ?
