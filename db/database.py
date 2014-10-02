@@ -176,6 +176,7 @@ class Database:
                     made_by varchar(20),
                     made_to varchar(20),
                     accountId varchar(36),
+                    date_added timestamp default NULL,
                     constraint u_constrainte5 unique (accountId)
                 );
         """
@@ -187,6 +188,35 @@ class Database:
             cursor.execute(query)
             conn.commit()
             sys.stdout.write("created table mid\n")
+            cursor.close()
+
+        except Exception, e:
+            cursor.close()
+            raise e
+
+    def Cookie(self):
+
+        """
+        userId: 
+        cookie:
+        """
+
+        query = """
+                CREATE TABLE IF NOT EXISTS cookie (
+                    id bigserial primary key,
+                    userId varchar(36) NOT NULL,
+                    cookie varchar(36) NOT NULL,
+                    date_added timestamp default NULL
+                );
+        """
+
+        cursor = self.connection.cursor()
+        conn = self.connection
+
+        try:
+            cursor.execute(query)
+            conn.commit()
+            sys.stdout.write("created table cookie\n")
             cursor.close()
 
         except Exception, e:
@@ -338,3 +368,32 @@ class Database:
             sys.stdout.write(e)
             msg.message = str(e)
             return msg #how to handle this -> rollbacks ?
+
+    def is_logged(self, user):
+
+        query = """
+            SELECT * FROM cookie WHERE cookie=%s
+        """ % (user.cookie)
+
+        cursor = self.connection.cursor()
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchone()
+            cursor.close()
+
+        except Exception, e:
+            print e
+            raise e
+
+        if(result == None):
+            return 0
+
+        elif (result[0] != user.userId):
+            return 0
+
+        elif (result[0] == user.userId):
+            return 1
+
+        else:
+            return 0

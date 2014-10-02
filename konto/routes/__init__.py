@@ -15,9 +15,15 @@ con.connect()
 @app.route('/')
 
 def home():
-    user_cookie = request.cookies.get('user')
+    user = jsontree.jsontree()
+    user.user_id = request.cookies.get('user')
+    user.user_cookie = request.cookies.get('tea')
+
+    if(con.is_logged(user) == 0):
+        return render_template('home.html')
 
     return render_template('home.html')
+
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
