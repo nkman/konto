@@ -19,7 +19,7 @@ def home():
     user.user_id = request.cookies.get('user')
     user.user_cookie = request.cookies.get('tea')
 
-    if(con.is_logged(user) == 0):
+    if(user.user_id == '' or user.user_cookie == '' or con.is_logged(user) == 0):
         return render_template('home.html')
 
     return render_template('home.html')
@@ -33,6 +33,7 @@ def admin():
         con.address_table()
         con.account_table()
         con.Med_table()
+        con.Cookie()
         return "Done"
 
     except Exception, e:
@@ -73,3 +74,10 @@ def login():
     user.username = request.form['username']
     user.password = request.form['password']
 
+    msg = con.verify_user_credential(user)
+    if(msg.status == 1):
+        # set_cookie()
+        return "Logged in !"
+
+    else:
+        return json.dumps(msg)

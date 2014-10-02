@@ -372,8 +372,8 @@ class Database:
     def is_logged(self, user):
 
         query = """
-            SELECT * FROM cookie WHERE cookie=%s
-        """ % (user.cookie)
+            SELECT * FROM cookie WHERE cookie=\'%s\'
+        """ % (user.user_cookie)
 
         cursor = self.connection.cursor()
 
@@ -389,11 +389,44 @@ class Database:
         if(result == None):
             return 0
 
-        elif (result[0] != user.userId):
+        elif (result[0] != user.user_id):
             return 0
 
-        elif (result[0] == user.userId):
+        elif (result[0] == user.user_id):
             return 1
 
         else:
             return 0
+
+    def verify_user_credential(self, user):
+
+        username = user.username
+        password = user.password
+
+        query = """
+            SELECT password FROM users WHERE username=\'%s\'
+        """ % (username)
+
+        cursor = self.connection.cursor()
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchone()
+            cursor.close()
+
+        except Exception, e:
+            raise e
+
+        msg = jsontree.jsontree()
+        if(result == None):
+            msg.status = 0
+            msg.message = "No such user exists !!"
+
+        elif(result[0] == password):
+            msg.status = 1
+
+        else:
+            msg.status = 0
+            msg.message = "Wrong password."
+
+        return msg
