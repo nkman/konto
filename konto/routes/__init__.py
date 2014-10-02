@@ -75,9 +75,14 @@ def login():
     user.password = request.form['password']
 
     msg = con.verify_user_credential(user)
+
     if(msg.status == 1):
-        # set_cookie()
-        return "Logged in !"
+        user.user_id = msg.userId
+        user_detail = con.set_user_cookie(user)
+        resp = make_response(render_template('home.html'))
+        resp.set_cookie('user', user_detail.user_id)
+        resp.set_cookie('tea', user_detail.cookie)
+        return resp
 
     else:
         return json.dumps(msg)

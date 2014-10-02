@@ -404,7 +404,7 @@ class Database:
         password = user.password
 
         query = """
-            SELECT password FROM users WHERE username=\'%s\'
+            SELECT password, userId FROM users WHERE username=\'%s\'
         """ % (username)
 
         cursor = self.connection.cursor()
@@ -424,9 +424,35 @@ class Database:
 
         elif(result[0] == password):
             msg.status = 1
+            msg.userId = result[1]
+            msg.username = username
 
         else:
             msg.status = 0
             msg.message = "Wrong password."
 
         return msg
+
+    def set_user_cookie(self, user):
+
+        user_id = user.user_id
+        date_added = datetime.now()
+        user.cookie = str(uuid.uuid1())
+
+        query = """
+            INSERT INTO cookie (userId, cookie, date_added) 
+            VALUES (\'%s\', \'%s\', \'%s\')
+        """ % (user_id, user.cookie, date_added)
+
+        conn = self.connection
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(query)
+            conn.commit()
+            cursor.close()
+
+        except Exception, e:
+            raise e
+
+        return user
