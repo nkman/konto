@@ -115,4 +115,8 @@ def profile(username):
     is_logged = con.is_logged(user)
 
     if(user.user_id == '' or user.user_cookie == '' or is_logged == 0):
-        return render_template('profile.html')
+        return render_template('home.html')
+
+    else:
+        _user = json.loads(user_db.user_detail(user.user_id))
+        return render_template('profile.html', user=_user)

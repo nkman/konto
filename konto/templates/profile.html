@@ -1,16 +1,41 @@
 <html>
-	<head>
-		<title>konto</title>
-		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home.css')}}">
-		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css')}}">
-	</head>
-	<body>
-		<div class="home-top-header">
-			<div class="top-links">
-				<span><a href="/profile/{{ user.username }}">{{ user.firstname }} {{ user.lastname }}</a></span>
-			</div>
-		</div>
+    <head>
+        <title>konto</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home.css')}}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css')}}">
+    </head>
+    <body>
+        <div class="home-top-header">
+            <div class="top-links">
+                <span><a href="/profile/{{ user.username }}">{{ user.firstname }} {{ user.lastname }}</a></span>
+            </div>
+        </div>
 
-		<div class="remaining-body"></div>
-	</body>
+        <div class="remaining-body">
+            <div class="detail-modifier">
+                <form action="/profile/modify" method="post">
+                    <div >First Name :</div>
+                    <input type="text" name="firstname" value="{{ user.firstname }}" id="modify">
+                    <br><br>
+
+                    <span>Last Name :</span>
+                    <input type="text" name="lastname" value="{{ user.lastname }}" id="modify">
+                    <br><br>
+                    
+                    <span>Username :</span>
+                    <input type="text" name="username" value="{{ user.username }}" id="modify">
+                    <br><br>
+                    
+                    <span>Password :</span>
+                    <input type="password" name="password" id="modify">
+                    <br><br>
+                    
+                    <div id="input-button">
+                        <input type="submit" value="modify" id="input-button-style">
+                        <button id="input-button-style"><a href="/">cancel</a></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </body>
 </html>

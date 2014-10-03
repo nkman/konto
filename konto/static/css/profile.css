@@ -1,0 +1,37 @@
+body{
+	overflow-x: hidden;
+}
+.remaining-body{
+	height: 550px;
+	width: auto;
+	margin-top: 40px;
+	background-color: rgb(123, 252, 221);
+}
+
+#modify{
+	height: 30px;
+	width: 200px;
+	transform: translate(100px, -23px);
+}
+
+.detail-modifier{
+	position: relative;
+	top: 80px;
+	left: 60px;
+	width: 300px;
+	height: 300px;
+}
+
+.remaining-body .detail-modifier span{
+	display: block;
+	width: 100px;
+}
+
+#input-button{
+	transform: translate(100px, 0px);
+}
+
+#input-button-style{
+	height: 30px;
+	width: 97px;
+}
