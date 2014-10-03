@@ -27,7 +27,7 @@ def home():
         return render_template('home.html')
 
     else:
-        return render_template('konto.html', user=user_db.user_detail(user.user_id))
+        return render_template('konto.html', user=json.loads(user_db.user_detail(user.user_id)))
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -84,7 +84,7 @@ def login():
     if(msg.status == 1):
         user.user_id = msg.userId
         user_detail = con.set_user_cookie(user)
-        resp = make_response(render_template('konto.html', user=user_db.user_detail(user.user_id)))
+        resp = make_response(render_template('konto.html', user=json.loads(user_db.user_detail(user.user_id))))
         resp.set_cookie('user', user_detail.user_id)
         resp.set_cookie('tea', user_detail.cookie)
         return resp
