@@ -233,6 +233,34 @@ class Database:
     def close_connection(self):
         self.connection.close()
 
+    def drop_all(self):
+        
+        query = [
+            'DROP TABLE users', 
+            'DROP TABLE account', 
+            'DROP TABLE address',
+            'DROP TABLE cookie',
+            'DROP TABLE mid'
+            ]
+
+        conn = self.connection
+        cursor = conn.cursor()
+
+        for q in query:
+            try:
+                cursor.execute(q)
+                sys.stdout.write("Deleted all tables !!")
+
+            except Exception, e:
+                raise e
+
+        try:
+            conn.commit()
+            cursor.close()
+
+        except Exception, e:
+            raise e
+
     def user_found(self, username):
 
         query = 'SELECT * FROM users WHERE username=\'%s\'' % username

@@ -28,7 +28,7 @@ def home():
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     try:
-        con.connect()
+        con.drop_all()
         con.user_table()
         con.address_table()
         con.account_table()
