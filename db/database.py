@@ -552,8 +552,17 @@ class Database:
             msg.message = "Inserted into account."
 
         except Exception, e:
+            self.debug_InternalError(e)
             msg.status = 0
             msg.message = e
             sys.stdout.write()
 
         return msg
+
+    def debug_InternalError(self, e):
+
+        if(e == 'InternalError'):
+            self.reset_connection()
+
+        else:
+            pass
