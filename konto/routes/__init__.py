@@ -86,3 +86,16 @@ def login():
 
     else:
         return json.dumps(msg)
+
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+
+    user = jsontree.jsontree()
+
+    user.user_id = request.cookies.get('user')
+    user.cookie = request.cookies.get('tea')
+
+    msg = con.logout(user)
+
+    render_template('logout.html', msg=msg)

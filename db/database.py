@@ -456,3 +456,31 @@ class Database:
             raise e
 
         return user
+
+    def logout(self, user):
+
+        user_id = user.user_id
+        cookie = user.cookie
+
+        query = """
+            DELETE FROM cookie WHERE cookie=\'%s\'
+        """ % (cookie)
+
+        conn = self.connection
+        cursor = conn.cursor()
+
+        msg = jsontree.jsontree()
+
+        try:
+            cursor.execute(query)
+            conn.commit()
+            cursor.close()
+            msg.status = 1
+            msg.message = "Logged out."
+
+        except Exception, e:
+            msg.status = 0
+            msg.message = e
+            sys.stdout.write(e)
+
+        return msg
