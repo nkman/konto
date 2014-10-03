@@ -82,8 +82,9 @@ class Database:
             cursor.close()
 
         except Exception, e:
+            self.debug_InternalError(e)
             cursor.close()
-            raise e
+            sys.stdout.write(e)
 
     def address_table(self):
 
@@ -116,8 +117,9 @@ class Database:
             cursor.close()
 
         except Exception, e:
+            self.debug_InternalError(e)
             cursor.close()
-            raise e
+            sys.stdout.write(e)
 
     def account_table(self):
 
@@ -156,8 +158,9 @@ class Database:
             cursor.close()
 
         except Exception, e:
+            self.debug_InternalError(e)
             cursor.close()
-            raise e
+            sys.stdout.write(e)
 
 
     def Med_table(self):
@@ -191,8 +194,9 @@ class Database:
             cursor.close()
 
         except Exception, e:
+            self.debug_InternalError(e)
             cursor.close()
-            raise e
+            sys.stdout.write(e)
 
     def Cookie(self):
 
@@ -220,8 +224,9 @@ class Database:
             cursor.close()
 
         except Exception, e:
+            self.debug_InternalError(e)
             cursor.close()
-            raise e
+            sys.stdout.write(e)
 
     def reset_connection(self):
         sys.stdout.write("Closing the connection.\n")
@@ -252,27 +257,35 @@ class Database:
                 sys.stdout.write("Deleted all tables !!")
 
             except Exception, e:
-                raise e
+                self.debug_InternalError(e)
+                sys.stdout.write(e)
 
         try:
             conn.commit()
             cursor.close()
 
         except Exception, e:
-            raise e
+            self.debug_InternalError(e)
+            sys.stdout.write(e)
 
     def user_found(self, username):
 
         query = 'SELECT * FROM users WHERE username=\'%s\'' % username
-
         cursor = self.connection.cursor()
-        cursor.execute(query)
+
+        try:
+            cursor.execute(query)
+
+        except Exception, e:
+            self.debug_InternalError(e)
+            sys.stdout.write(e)
 
         result = cursor.fetchone()
         cursor.close()
 
         if (result == None):
             return 0
+
         else:
             sys.stdout.write("Username exists")
             return 1
@@ -309,10 +322,9 @@ class Database:
             cursor.close()
 
         except Exception, e:
-            if (e == 'InternalError'):
-                self.reset_connection()
+            self.debug_InternalError(e)
 
-            print e
+            sys.stdout.write(e)
             cursor.close()
             msg.status = 0
             msg.message = "user creation failed !!"
@@ -322,9 +334,8 @@ class Database:
             msg = self.create_address(user)
 
         except Exception, e:
-            if (e == 'InternalError'):
-                self.reset_connection()
-
+            self.debug_InternalError(e)
+            sys.stdout.write(e)
             msg.status = 0
             msg.message = "user address creation failed !!"
             return msg
@@ -387,9 +398,7 @@ class Database:
             return msg
 
         except Exception, e:
-            if (e == 'InternalError'):
-                self.reset_connection()
-
+            self.debug_InternalError(e)
             cursor.close()
             msg.status = 0
             # msg.message = "Unable to commit create address query !!"
@@ -411,8 +420,8 @@ class Database:
             cursor.close()
 
         except Exception, e:
-            print e
-            raise e
+            self.debug_InternalError(e)
+            sys.stdout.write(e)
 
         if(result == None):
             return 0
@@ -443,7 +452,8 @@ class Database:
             cursor.close()
 
         except Exception, e:
-            raise e
+            self.debug_InternalError(e)
+            sys.stdout.write(e)
 
         msg = jsontree.jsontree()
         if(result == None):
@@ -481,7 +491,8 @@ class Database:
             cursor.close()
 
         except Exception, e:
-            raise e
+            self.debug_InternalError(e)
+            sys.stdout.write(e)
 
         return user
 
@@ -507,6 +518,7 @@ class Database:
             msg.message = "Logged out."
 
         except Exception, e:
+            self.debug_InternalError(e)
             msg.status = 0
             msg.message = e
             sys.stdout.write(e)
