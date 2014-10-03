@@ -7,10 +7,13 @@ import uuid
 import jsontree, json
 
 from db import database
+from user import user
 
 configuration = config.config()
 con = database.Database(configuration)
 con.connect()
+
+user_db = user.User(configuration)
 
 @app.route('/')
 
@@ -18,11 +21,13 @@ def home():
     user = jsontree.jsontree()
     user.user_id = request.cookies.get('user')
     user.user_cookie = request.cookies.get('tea')
+    is_logged = con.is_logged(user)
 
-    if(user.user_id == '' or user.user_cookie == '' or con.is_logged(user) == 0):
+    if(user.user_id == '' or user.user_cookie == '' or is_logged == 0):
         return render_template('home.html')
 
-    return render_template('home.html')
+    else:
+        return render_template('konto.html', user=user_db.user_detail(user.user_id))
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -79,7 +84,7 @@ def login():
     if(msg.status == 1):
         user.user_id = msg.userId
         user_detail = con.set_user_cookie(user)
-        resp = make_response(render_template('home.html'))
+        resp = make_response(render_template('konto.html', user=user_db.user_detail(user.user_id)))
         resp.set_cookie('user', user_detail.user_id)
         resp.set_cookie('tea', user_detail.cookie)
         return resp

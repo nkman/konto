@@ -49,8 +49,14 @@ class Database:
 
     def connect(self):
 
-        self.connection = psycopg2.connect(host=self.host, port=self.port, user=self.user, password=self.password, database=self.database)
-
+        connection = psycopg2.connect(host=self.host, 
+            port=self.port, 
+            user=self.user, 
+            password=self.password, 
+            database=self.database
+        )
+        self.connection = connection
+        return connection
 
     def user_table(self):
 
@@ -409,7 +415,7 @@ class Database:
     def is_logged(self, user):
 
         query = """
-            SELECT * FROM cookie WHERE cookie=\'%s\'
+            SELECT userId, cookie FROM cookie WHERE cookie=\'%s\'
         """ % (user.user_cookie)
 
         cursor = self.connection.cursor()
