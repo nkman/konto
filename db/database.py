@@ -484,3 +484,48 @@ class Database:
             sys.stdout.write(e)
 
         return msg
+
+    def insert_into_account_table(self, account):
+
+        account.account_id = str(uuid.uuid1())
+
+        account_id = account.account_id
+        user_id1 = account.user_id1
+        user_id2 = account.user_id2
+        balance = account.balance
+        is_positive = account.is_positive
+        confirmed_by_user1 = account.confirmed_by_user1
+        confirmed_by_user2 = account.confirmed_by_user2
+        date_added = datetime.now()
+
+        query = """
+                INSERT INTO account (
+                    accountId,  userId1,
+                    userId2 ,   balance,
+                    is_positive,    confirmed_by_user1,
+                    confirmed_by_user2, date_added
+                ) VALUES (
+                    \'%s\', \'%s\', \'%s\', \'%s\', 
+                    \'%s\', \'%s\', \'%s\', \'%s\'
+                )
+        """ % (account_id, user_id1, user_id2, balance, is_positive,
+                confirmed_by_user1, confirmed_by_user2, date_added)
+
+        conn = self.connection
+        cursor = conn.cursor()
+
+        msg = jsontree.jsontree()
+
+        try:
+            cursor.execute(query)
+            conn.commit()
+            cursor.close()
+            msg.status = 1
+            msg.message = "Inserted into account."
+
+        except Exception, e:
+            msg.status = 0
+            msg.message = e
+            sys.stdout.write()
+
+        return msg
