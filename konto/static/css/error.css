@@ -1,0 +1,15 @@
+.error-header{
+	position: relative;
+	height: 20px;
+	width: 100px;
+	top: -7px;
+	left: 600px;
+	text-align: center;
+}
+
+.error-message{
+	position: relative;
+	top: 20px;
+	height: 20px;
+	text-align: center;
+}

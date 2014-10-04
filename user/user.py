@@ -157,10 +157,10 @@ class User:
         query = """
             UPDATE address SET
             firstname = \'%s\', lastname = \'%s\'
-            WHERE useId = \'%s\'
+            WHERE userId = \'%s\'
         """ % (firstname, lastname, user_id)
 
-        cursor = ccon.cursor()
+        cursor = con.cursor()
 
         try:
             cursor.execute(query)

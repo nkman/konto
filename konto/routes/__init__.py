@@ -1,6 +1,6 @@
 from konto import app
 from flask import Flask, jsonify, request, render_template
-from flask import make_response, url_for
+from flask import make_response, url_for, redirect
 
 import config
 import uuid
@@ -121,7 +121,7 @@ def logout():
 
     msg = con.logout(user)
 
-    render_template('logout.html', msg=msg)
+    return redirect(url_for('home'))
 
 @app.route('/profile/<username>', methods=['GET', 'POST'])
 def profile(username):
@@ -181,7 +181,8 @@ def modify():
     if(is_changed.status == 0):
         error_msg.status = 0
         error_msg.message = is_changed.message
+        return render_template('error.html', msg=error_msg)
 
     else:
-        return redirect(url_for('profile'))
+        return redirect(url_for('home'))
         pass

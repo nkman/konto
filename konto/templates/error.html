@@ -1,0 +1,27 @@
+<html>
+    <head>
+        <title>konto</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home.css')}}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/error.css')}}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css')}}">
+    </head>
+    <body>
+        <div class="home-top-header">
+            <div class="top-links">
+            	{% if user != undefined %}
+                <span><a href="/profile/{{ user.username }}">{{ user.firstname }} {{ user.lastname }}</a></span>
+                {% endif %}
+                &nbsp;&nbsp;&nbsp;<span><a href="/">Home</a></span>
+                &nbsp;&nbsp;&nbsp;<span><a href="/logout">Logout</a></span>
+            </div>
+            <div class="error-header">ERROR</div>
+        </div>
+
+        <div class="remaining-body">
+        	<div class="error-message">
+        		<span>{{ msg.message }}</span>
+        	</div>
+        </div>
+
+    </body>
+</html>

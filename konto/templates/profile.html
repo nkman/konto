@@ -8,6 +8,8 @@
         <div class="home-top-header">
             <div class="top-links">
                 <span><a href="/profile/{{ user.username }}">{{ user.firstname }} {{ user.lastname }}</a></span>
+                &nbsp;&nbsp;&nbsp;<span><a href="/">Home</a></span>
+                &nbsp;&nbsp;&nbsp;<span><a href="/logout">Logout</a></span>
             </div>
         </div>
 
@@ -30,6 +32,10 @@
                     <input type="password" name="password" id="modify">
                     <br><br>
                     
+                    <span>Current Password :</span>
+                    <input type="password" name="current_password" id="modify">
+                    <br><br>
+
                     <div id="input-button">
                         <input type="submit" value="modify" id="input-button-style">
                         <button id="input-button-style"><a href="/">cancel</a></button>
