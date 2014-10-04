@@ -175,3 +175,55 @@ class User:
 
         msg.status = 1
         return msg
+
+    def user_account_detail(self, user_id):
+
+        error_msg = jsontree.jsontree()
+        account_detail = jsontree.jsontree()
+
+        query = """
+            SELECT * FROM account
+            WHERE userId1 = \'%s\' AND
+            confirmed_by_user1 = True AND 
+            confirmed_by_user2 = True
+        """ % (user_id)
+
+        cursor = self.con.cursor()
+
+        try:
+            cursor.execute(query)
+            result1 = cursor.fetchall()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = e
+            return error_msg
+
+        query = """
+            SELECT * FROM account
+            WHERE userId2 = \'%s\' AND
+            confirmed_by_user1 = True AND 
+            confirmed_by_user2 = True
+        """ % (user_id)
+
+        try:
+            cursor.execute(query)
+            result2 = cursor.fetchall()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = e
+            return error_msg
+
+        account_detail.current_balance = 0
+
+        for acc in result1:
+            account_detail.current_balance += acc['balance']
+
+        for acc in result2:
+            account_detail.current_balance -= acc['balance']
+
+        account_detail.positive = result1
+        account_detail.negetive = result2
+
+        return json.dumps(account_detail)
