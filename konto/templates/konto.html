@@ -3,6 +3,7 @@
         <title>konto</title>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home.css')}}">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css')}}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/konto.css')}}">
         <script src="{{ url_for('static', filename='js/konto.js')}}"></script>
     </head>
     <body>
@@ -16,11 +17,20 @@
 
         <div class="remaining-body">
             <div class="current-amount">
-                <span>Current Balance :</span>
-                <span>{{ account.current_balance }}</span>
+                <span>Current Balance : {{ account.current_balance }} (<a href="/add">Add More</a>)</span>
             </div>
-            <div class="people-owe-you"></div>
-            <div class="you-owe-people"></div>
+            <div class="line-rel horizontal-line"></div>
+            <div class="people-owe-you">
+                <div class="people-owe-you-header">
+                    <span>People who owe you</span>
+                </div>
+            </div>
+
+            <div class="you-owe-people">
+                <div class="you-owe-people-header">
+                    <span>You owe people</span>
+                </div>
+            </div>
         </div>
     </body>
 </html>

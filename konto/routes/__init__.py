@@ -26,9 +26,10 @@ def home():
     if(user.user_id == '' or user.user_cookie == '' or is_logged == 0):
         return render_template('home.html')
 
-    else:
-        _user = json.loads(user_db.user_detail(user.user_id))
-        return render_template('konto.html', user=_user)
+    _user = json.loads(user_db.user_detail(user.user_id))
+    _account = json.loads(user_db.user_account_detail(user.user_id))
+
+    return render_template('konto.html', user=_user, account=_account)
 
 
 @app.route('/admin', methods=['GET', 'POST'])
