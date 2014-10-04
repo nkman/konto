@@ -153,3 +153,25 @@ class User:
             msg.phase = 2
             msg.message = e
             return msg
+
+        query = """
+            UPDATE address SET
+            firstname = \'%s\', lastname = \'%s\'
+            WHERE useId = \'%s\'
+        """ % (firstname, lastname, user_id)
+
+        cursor = ccon.cursor()
+
+        try:
+            cursor.execute(query)
+            con.commit()
+            cursor.close()
+
+        except Exception, e:
+            msg.status = 0
+            msg.phase = 2
+            msg.message = e
+            return msg
+
+        msg.status = 1
+        return msg
