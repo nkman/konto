@@ -583,4 +583,5 @@ class Database:
             self.reset_connection()
 
         else:
+            self.reset_connection()
             pass

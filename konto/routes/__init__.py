@@ -50,20 +50,36 @@ def admin():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
 
+    error_msg = jsontree.jsontree()
+
     if (request.method == 'GET'):
-        return "Method Not Allowed !!"
+        error_msg.status = 0
+        error_msg.message = "Method Not Allowed !!"
+        return render_template("error.html", msg=error_msg)
 
     user = jsontree.jsontree()
-    user.username = request.form['username']
-    user.password = request.form['password']
-    user.firstname = request.form['firstname']
-    user.lastname = request.form['lastname']
-    user.phone = request.form['phone']
+
+    try:
+        user.username = request.form['username']
+        user.password = request.form['password']
+        user.firstname = request.form['firstname']
+        user.lastname = request.form['lastname']
+        user.phone = request.form['phone']
+
+    except Exception, TypeError:
+        error_msg.status = 0
+        error_msg.message = "Unexpected buffer data encountered !!"
+        return render_template('error.html', msg=error_msg)
 
     if(user.username == '' or user.password == '' or user.firstname == ''):
-        return "Some credentials missing"
+        error_msg.status = 0
+        error_msg.message = "Some credentials missing"
+        return render_template('error.html', msg=error_msg)
+
     elif(user.lastname == ''):
-        return "Some credentials missing"
+        error_msg.status = 0
+        error_msg.message = "Lastname is missing"
+        return render_template('error.html', msg=error_msg)
 
     if(user.phone == ''):
         user.phone = None
@@ -120,3 +136,52 @@ def profile(username):
     else:
         _user = json.loads(user_db.user_detail(user.user_id))
         return render_template('profile.html', user=_user)
+
+@app.route('/profile/modify')
+def modify():
+    user = jsontree.jsontree()
+    user.user_id = request.cookies.get('user')
+    user.user_cookie = request.cookies.get('tea')
+    is_logged = con.is_logged(user)
+
+    if(user.user_id == '' or user.user_cookie == '' or is_logged == 0):
+        return render_template('home.html')
+
+    error_msg = jsontree.jsontree()
+
+    try:
+        user.username = request.form['username']
+        user.firstname = request.form['firstname']
+        user.lastname = request.form['lastname']
+        user.password = request.form['password']
+        user.current_password = request.form['current_password']
+
+    except Exception, e:
+        error_msg.status = 0
+        error_msg.message = e
+        return render_template('error.html', msg=error_msg)
+
+    if(user.current_password == ''):
+        error_msg.status = 0
+        error_msg.message = "Current password is required !!\nAuthentication failed !!"
+        return render_template('error.html', msg=error_msg)
+
+    if(user.username == '' or user.firstname == ''):
+        error_msg.status = 0
+        error_msg.message = "Some credentials missing"
+        return render_template('error.html', msg=error_msg)
+
+    elif(user.lastname == ''):
+        error_msg.status = 0
+        error_msg.message = "Lastname is missing"
+        return render_template('error.html', msg=error_msg)
+
+    is_changed = user_db.modify_user(user)
+
+    if(is_changed.status == 0):
+        error_msg.status = 0
+        error_msg.message = is_changed.message
+
+    else:
+        # redirect to profile.
+        pass
