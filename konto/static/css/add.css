@@ -1,0 +1,28 @@
+.add-internal-body{
+	position: relative;
+	top: 40px;
+	/*text-align: center;*/
+	margin-left: auto;
+	margin-right: auto;
+	width: 500px;
+	height: 550px;
+
+	/*border-style: solid;
+    border-width: 1px;
+    border-color: black;*/
+}
+
+.remaining-body .add-internal-body span{
+	display: block;
+	width: 100px;
+	position: relative;
+	left: 70px;
+}
+
+#add-form-input{
+	position: relative;
+	left: 70px;
+	height: 30px;
+	width: 200px;
+	transform: translate(100px, -23px);
+}

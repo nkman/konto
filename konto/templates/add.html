@@ -3,7 +3,7 @@
         <title>konto</title>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home.css')}}">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css')}}">
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/konto.css')}}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/add.css')}}">
         <script src="{{ url_for('static', filename='js/konto.js')}}"></script>
     </head>
     <body>
@@ -16,7 +16,27 @@
         </div>
 
         <div class="remaining-body">
-        
+            <div class="add-internal-body">
+                <form name="add_user_form" action="/ajax/getname" method="post">
+                    
+                    <span>Username :</span>
+                    <select name="fellow-username" id="add-form-input" onchange="get(this)">
+                        
+                    </select>
+                    <br><br>
+
+                    <span>Amount :</span>
+                    <input type="text" name="amount" id="add-form-input">
+                    <br><br>
+
+                    <span>Mod :</span>
+                    <select name="sign" id="add-form-input">
+                        <option value="positive">He'll give me</option>
+                        <option value="negetive">I'll give him</option>
+                    </select>
+
+                </form>
+            </div>
         </div>
     </body>
 </html>

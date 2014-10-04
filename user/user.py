@@ -234,7 +234,7 @@ class User:
         error_msg = jsontree.jsontree()
 
         query = """
-            SELECT userId, username FROM users
+            SELECT username FROM users
             WHERE username LIKE \'%s%%\'
         """ % (name)
 

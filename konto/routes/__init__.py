@@ -226,7 +226,7 @@ def ajax_api_getname():
     is_logged = con.is_logged(user)
 
     if(user.user_id == '' or user.user_cookie == '' or is_logged == 0):
-        return matching_names()
+        return matching_names
 
     name = request.forms['fellow_username']
     matching_names = user_db.matching_names(name)
