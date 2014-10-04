@@ -213,3 +213,22 @@ def add_back(user_id):
 
     user_id_user1 = user.user_id
     user_id_user2 = user_id
+
+    #This is fucking incomplete !!
+
+@app.route('/ajax/getname')
+def ajax_api_getname():
+
+    matching_names = {}
+    user = jsontree.jsontree()
+    user.user_id = request.cookies.get('user')
+    user.user_cookie = request.cookies.get('tea')
+    is_logged = con.is_logged(user)
+
+    if(user.user_id == '' or user.user_cookie == '' or is_logged == 0):
+        return matching_names()
+
+    name = request.forms['fellow_username']
+    matching_names = user_db.matching_names(name)
+
+    return matching_names

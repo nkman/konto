@@ -209,6 +209,7 @@ class User:
         try:
             cursor.execute(query)
             result2 = cursor.fetchall()
+            cursor.close()
 
         except Exception, e:
             error_msg.status = 0
@@ -227,3 +228,26 @@ class User:
         account_detail.negetive = result2
 
         return json.dumps(account_detail)
+
+    def matching_names(self, name):
+
+        error_msg = jsontree.jsontree()
+
+        query = """
+            SELECT userId, username FROM users
+            WHERE username LIKE \'%s%%\'
+        """ % (name)
+
+        cursor = self.con.cursor()
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchall()
+            cursor.close()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = e
+            return error_msg
+        
+        return result
