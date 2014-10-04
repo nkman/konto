@@ -187,3 +187,29 @@ def modify():
     else:
         return redirect(url_for('home'))
         pass
+
+@app.route('/add', methods=['GET', 'POST'])
+def add_front():
+    user = jsontree.jsontree()
+    user.user_id = request.cookies.get('user')
+    user.user_cookie = request.cookies.get('tea')
+    is_logged = con.is_logged(user)
+
+    if(user.user_id == '' or user.user_cookie == '' or is_logged == 0):
+        return render_template('home.html')
+
+    _user = json.loads(user_db.user_detail(user.user_id))
+    return render_template('add.html', user=_user)
+
+@app.route('/add/<user_id>', methods=['GET', 'POST'])
+def add_back(user_id):
+    user = jsontree.jsontree()
+    user.user_id = request.cookies.get('user')
+    user.user_cookie = request.cookies.get('tea')
+    is_logged = con.is_logged(user)
+
+    if(user.user_id == '' or user.user_cookie == '' or is_logged == 0):
+        return render_template('home.html')
+
+    user_id_user1 = user.user_id
+    user_id_user2 = user_id

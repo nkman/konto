@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <title>konto</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home.css')}}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css')}}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/konto.css')}}">
+        <script src="{{ url_for('static', filename='js/konto.js')}}"></script>
+    </head>
+    <body>
+        <div class="home-top-header">
+            <div class="top-links">
+                <span><a href="/profile/{{ user.username }}">{{ user.firstname }} {{ user.lastname }}</a></span>
+                &nbsp;&nbsp;&nbsp;<span><a href="/">Home</a></span>
+                &nbsp;&nbsp;&nbsp;<span><a href="/logout">Logout</a></span>
+            </div>
+        </div>
+
+        <div class="remaining-body">
+        </div>
+    </body>
+</html>
