@@ -17,7 +17,7 @@
 
         <div class="remaining-body">
             <div class="add-internal-body">
-                <form name="add_user_form" action="/add/balance" method="post">
+                <form method="post" action="/add/{{ user.username }}">
                     
                     <span>Username :</span>
                     <input type="text" name="fellow_username" id="add-form-input">
@@ -34,7 +34,8 @@
                     </select>
                     <br><br>
 
-                    <button id="add-form-input-button">Accept</button>
+                    <input type="submit" id="add-form-input-button" name="action" value="Accept">
+                    <!-- <button id="add-form-input-button">Accept</button> -->
                 </form>
             </div>
         </div>

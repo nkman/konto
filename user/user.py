@@ -18,11 +18,20 @@ class User:
             user.lastname = firstname_lastname.lastname
             user.user_id = user_id
 
+        else:
+            user.status = 0
+            return json.dumps(user)
+
         username = self.username(user_id)
 
         if(username.status == 1):
             user.username = username.username
 
+        else:
+            user.status = 0
+            return json.dumps(user)
+
+        user.status = 1
         return json.dumps(user)
 
     def firstname_lastname(self, user_id):
@@ -108,7 +117,7 @@ class User:
         except Exception, e:
             msg.status = 0
             msg.phase = 1
-            msg.message = e
+            msg.message = str(e)
             return msg
 
         if(result == None):
@@ -151,7 +160,7 @@ class User:
         except Exception, e:
             msg.status = 0
             msg.phase = 2
-            msg.message = e
+            msg.message = str(e)
             return msg
 
         query = """
@@ -170,7 +179,7 @@ class User:
         except Exception, e:
             msg.status = 0
             msg.phase = 2
-            msg.message = e
+            msg.message = str(e)
             return msg
 
         msg.status = 1
@@ -196,8 +205,9 @@ class User:
 
         except Exception, e:
             error_msg.status = 0
-            error_msg.message = e
-            return error_msg
+            error_msg.message = str(e)
+            sys.stdout.write('USER PHASE I')
+            return json.dumps(error_msg)
 
         query = """
             SELECT * FROM account
@@ -213,17 +223,19 @@ class User:
 
         except Exception, e:
             error_msg.status = 0
-            error_msg.message = e
-            return error_msg
+            error_msg.message = str(e)
+            sys.stdout.write('USER PHASE II')
+            return json.dumps(error_msg)
 
         account_detail.current_balance = 0
 
         for acc in result1:
-            account_detail.current_balance += acc['balance']
+            account_detail.current_balance += int(acc['balance'])
 
         for acc in result2:
-            account_detail.current_balance -= acc['balance']
+            account_detail.current_balance -= int(acc['balance'])
 
+        account_detail.status = 1
         account_detail.positive = result1
         account_detail.negetive = result2
 
@@ -247,8 +259,8 @@ class User:
 
         except Exception, e:
             error_msg.status = 0
-            error_msg.message = e
-            return error_msg
+            error_msg.message = str(e)
+            return json.dumps(error_msg)
         
         return result
 

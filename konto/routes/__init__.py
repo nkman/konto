@@ -27,7 +27,14 @@ def home():
         return render_template('home.html')
 
     _user = json.loads(user_db.user_detail(user.user_id))
+
+    if( _user['status'] == 0):
+        return render_template('error.html', msg=_user)
+
     _account = json.loads(user_db.user_account_detail(user.user_id))
+
+    if(_account['status'] == 0):
+        return render_template('error.html', msg=_account, user=_user)
 
     return render_template('konto.html', user=_user, account=_account)
 
@@ -202,8 +209,8 @@ def add_front():
     _user = json.loads(user_db.user_detail(user.user_id))
     return render_template('add.html', user=_user)
 
-@app.route('/add/balance', methods=['GET', 'POST'])
-def add_back():
+@app.route('/add/<username>', methods=['GET', 'POST'])
+def add_back(username=None):
     user = jsontree.jsontree()
     user.user_id = request.cookies.get('user')
     user.user_cookie = request.cookies.get('tea')
@@ -214,7 +221,7 @@ def add_back():
 
     user.fellow_username = request.form['fellow_username']
     user.amount = request.form['amount']
-    user.mod = request.form['mod']
+    user.mod = request.form['sign']
 
     user_db.create_balance(user)
 

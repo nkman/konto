@@ -1,7 +1,7 @@
 import os, sys
 import psycopg2
 import uuid
-import jsontree
+import jsontree, json
 from datetime import datetime
 
 """
@@ -182,9 +182,10 @@ class Database:
                 CREATE TABLE IF NOT EXISTS mid (
                     id bigserial primary key,
                     midId varchar(36) NOT NULL,
-                    made_by varchar(20),
-                    made_to varchar(20),
+                    made_by varchar(36),
+                    made_to varchar(36),
                     accountId varchar(36),
+                    approved boolean,
                     date_added timestamp default NULL,
                     constraint u_constrainte5 unique (accountId)
                 );
@@ -615,26 +616,22 @@ class Database:
 
         except Exception, e:
             error_msg.status = 0
-            error_msg.message = e
-            return error_msg
+            error_msg.message = str(e)
+            sys.stdout.write('DATABASE PHASE I')
+            return json.dumps(error_msg)
 
         if(result == None):
             error_msg.status = 0
-            error_msg.message = "THat username does not exists !!"
-            return error_msg
+            error_msg.message = "That username does not exists !!"
+            return json.dumps(error_msg)
 
-        """
-        accountId: (it will generate here)
-        userId1: (taken from User table)
-        userId2: (taken from User table)
-        balance:
-        is_positive: boolean (if positive => 2 owes 1)
-        confirmed_by_user1: boolean
-        confirmed_by_user2: boolean
-        """
 
         account_id = str(uuid.uuid1())
         
+        ##TODO:
+        ##If userid1 and userid2 already exists then
+        ##Update table accordingly.
+
         if(positive):
             query = """
                 INSERT INTO account (accountId,
@@ -661,8 +658,9 @@ class Database:
 
         except Exception, e:
             error_msg.status = 0
-            error_msg.message = e
-            return error_msg
+            error_msg.message = str(e)
+            sys.stdout.write('DATABASE PHASE II')
+            return json.dumps(error_msg)
 
         """
         made_by: userId
@@ -670,10 +668,14 @@ class Database:
         approved: boolean (will be approved by made_to user)
         """
 
+        date_added = datetime.now()
+        mid_id = str(uuid.uuid1())
+
         query = """
-            INSERT INTO mid(made_by, made_to, approved)
-            VALUES (\'%s\', \'%s\',\'%s\')
-        """ % (user.user_id, result[0], False)
+            INSERT INTO mid(made_by, made_to, midId,
+            accountId, date_added, approved)
+            VALUES (\'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%s\')
+        """ % (user.user_id, result[0], mid_id, account_id, date_added, False)
 
         try:
             cursor.execute(query)
@@ -681,8 +683,10 @@ class Database:
 
         except Exception, e:
             error_msg.status = 0
-            error_msg.message = e
-            return error_msg
+            error_msg.message = str(e)
+            print e
+            sys.stdout.write('DATABASE PHASE III')
+            return json.dumps(error_msg)
 
         error_msg.status = 1
-        return error_msg
+        return json.dumps(error_msg)
