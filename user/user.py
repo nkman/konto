@@ -267,3 +267,68 @@ class User:
     def create_balance(self, user):
 
         return self.connection.create_balance(user)
+
+    def notification(self, user_id):
+        
+        #Get notifications from mid
+        #Get notifications from notification
+
+        error_msg = jsontree.jsontree()
+        notice = jsontree.jsontree()
+
+        query = """
+            SELECT * FROM mid WHERE
+            userId1 = \'%s\' AND 
+            confirmed_by_user1 = \'%s\'
+        """ % (user_id, False)
+
+        cursor = self.con.cursor()
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchall()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = str(e)
+            return json.dumps(error_msg)
+
+        notice.positive = result
+
+        query = """
+            SELECT * FROM mid WHERE
+            userId2 = \'%s\' AND 
+            confirmed_by_user2 = \'%s\'
+        """ % (user_id, False)
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchall()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = str(e)
+            return json.dumps(error_msg)
+
+        notice.negetive = result
+
+        query = """
+            SELECT * FROM notification WHERE
+            userId = \'%s\' AND 
+            unread = \'%s\'
+        """ % (user_id, True)
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchall()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = str(e)
+            return json.dumps(error_msg)
+
+        notice.unread = result
+        notice.status = 1
+
+        notice = json.dumps(notice)
+        return notice

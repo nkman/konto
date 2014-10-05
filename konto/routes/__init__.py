@@ -48,6 +48,7 @@ def admin():
         con.account_table()
         con.Med_table()
         con.Cookie()
+        con.notification_table()
         return "Done"
 
     except Exception, e:

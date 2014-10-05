@@ -292,7 +292,8 @@ class Database:
             'DROP TABLE account', 
             'DROP TABLE address',
             'DROP TABLE cookie',
-            'DROP TABLE mid'
+            'DROP TABLE mid',
+            'DROP TABLE notification'
             ]
 
         conn = self.connection
