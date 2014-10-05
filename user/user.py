@@ -277,9 +277,9 @@ class User:
         notice = jsontree.jsontree()
 
         query = """
-            SELECT * FROM mid WHERE
-            made_to = \'%s\' AND 
-            approved = \'%s\'
+            SELECT * FROM account WHERE
+            userId1 = \'%s\' AND 
+            confirmed_by_user1 = \'%s\'
         """ % (user_id, False)
 
         cursor = self.con.cursor()
@@ -293,7 +293,24 @@ class User:
             error_msg.message = str(e)
             return json.dumps(error_msg)
 
-        notice.mid = result
+        notice.positive = result
+
+        query = """
+            SELECT * FROM account WHERE
+            userId2 = \'%s\' AND 
+            confirmed_by_user2 = \'%s\'
+        """ % (user_id, False)
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchall()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = str(e)
+            return json.dumps(error_msg)
+
+        notice.negetive = result
 
         query = """
             SELECT * FROM notification WHERE
@@ -310,7 +327,7 @@ class User:
             error_msg.message = str(e)
             return json.dumps(error_msg)
 
-        notice.notice = result
+        notice.unread = result
         notice.status = 1
 
         notice = json.dumps(notice)
