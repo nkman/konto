@@ -278,8 +278,8 @@ class User:
 
         query = """
             SELECT * FROM mid WHERE
-            userId1 = \'%s\' AND 
-            confirmed_by_user1 = \'%s\'
+            made_to = \'%s\' AND 
+            approved = \'%s\'
         """ % (user_id, False)
 
         cursor = self.con.cursor()
@@ -293,24 +293,7 @@ class User:
             error_msg.message = str(e)
             return json.dumps(error_msg)
 
-        notice.positive = result
-
-        query = """
-            SELECT * FROM mid WHERE
-            userId2 = \'%s\' AND 
-            confirmed_by_user2 = \'%s\'
-        """ % (user_id, False)
-
-        try:
-            cursor.execute(query)
-            result = cursor.fetchall()
-
-        except Exception, e:
-            error_msg.status = 0
-            error_msg.message = str(e)
-            return json.dumps(error_msg)
-
-        notice.negetive = result
+        notice.mid = result
 
         query = """
             SELECT * FROM notification WHERE
@@ -327,7 +310,7 @@ class User:
             error_msg.message = str(e)
             return json.dumps(error_msg)
 
-        notice.unread = result
+        notice.notice = result
         notice.status = 1
 
         notice = json.dumps(notice)

@@ -258,7 +258,7 @@ def notification():
     notice = user_db.notification(user.user_id)
     notice = json.loads(notice)
 
-    if(notice.status == 0):
+    if(notice['status'] == 0):
         return render_template('error.html', msg=notice)
 
     return render_template('notification.html', notice=notice)
