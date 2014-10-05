@@ -251,3 +251,7 @@ class User:
             return error_msg
         
         return result
+
+    def create_balance(self, user):
+
+        return self.connection.create_balance(user)

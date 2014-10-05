@@ -17,12 +17,10 @@
 
         <div class="remaining-body">
             <div class="add-internal-body">
-                <form name="add_user_form" action="/ajax/getname" method="post">
+                <form name="add_user_form" action="/add/balance" method="post">
                     
                     <span>Username :</span>
-                    <select name="fellow-username" id="add-form-input" onchange="get(this)">
-                        
-                    </select>
+                    <input type="text" name="fellow_username" id="add-form-input">
                     <br><br>
 
                     <span>Amount :</span>
@@ -34,7 +32,9 @@
                         <option value="positive">He'll give me</option>
                         <option value="negetive">I'll give him</option>
                     </select>
+                    <br><br>
 
+                    <button id="add-form-input-button">Accept</button>
                 </form>
             </div>
         </div>

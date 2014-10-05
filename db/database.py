@@ -585,3 +585,104 @@ class Database:
         else:
             self.reset_connection()
             pass
+
+    def create_balance(self, user):
+
+        amount = user.amount
+        mod = user.mod
+
+        if (mod == 'positive'):
+            positive = True
+
+        else:
+            positive = False
+
+        fellow_username = user.fellow_username
+
+        query = """
+            SELECT userId FROM users
+            WHERE username = \'%s\'
+        """ % (fellow_username)
+
+        conn = self.connection
+        cursor = conn.cursor()
+
+        error_msg = jsontree.jsontree()
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchone()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = e
+            return error_msg
+
+        if(result == None):
+            error_msg.status = 0
+            error_msg.message = "THat username does not exists !!"
+            return error_msg
+
+        """
+        accountId: (it will generate here)
+        userId1: (taken from User table)
+        userId2: (taken from User table)
+        balance:
+        is_positive: boolean (if positive => 2 owes 1)
+        confirmed_by_user1: boolean
+        confirmed_by_user2: boolean
+        """
+
+        account_id = str(uuid.uuid1())
+        
+        if(positive):
+            query = """
+                INSERT INTO account (accountId,
+                userId1, userId2, balance, is_positive,
+                confirmed_by_user1, confirmed_by_user2)
+                VALUES (\'%s\', \'%s\', \'%s\', \'%s\', 
+                \'%s\', \'%s\', \'%s\')
+            """ % (account_id, user.user_id, result[0], 
+                amount, True, True, False)
+
+        else:
+            query = """
+                INSERT INTO account (accountId,
+                userId1, userId2, balance, is_positive,
+                confirmed_by_user1, confirmed_by_user2)
+                VALUES (\'%s\', \'%s\', \'%s\', \'%s\', 
+                \'%s\', \'%s\', \'%s\')
+            """ % (account_id, result[0], user.user_id, 
+                amount, True, False, True)
+
+        try:
+            cursor.execute(query)
+            conn.commit()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = e
+            return error_msg
+
+        """
+        made_by: userId
+        made_to: userId
+        approved: boolean (will be approved by made_to user)
+        """
+
+        query = """
+            INSERT INTO mid(made_by, made_to, approved)
+            VALUES (\'%s\', \'%s\',\'%s\')
+        """ % (user.user_id, result[0], False)
+
+        try:
+            cursor.execute(query)
+            conn.commit()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = e
+            return error_msg
+
+        error_msg.status = 1
+        return error_msg

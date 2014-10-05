@@ -103,7 +103,8 @@ def login():
         user.user_id = msg.userId
         user_detail = con.set_user_cookie(user)
         _user = json.loads(user_db.user_detail(user.user_id))
-        resp = make_response(render_template('konto.html', user=_user))
+        _account = json.loads(user_db.user_account_detail(user.user_id))
+        resp = make_response(render_template('konto.html', user=_user, account=_account))
         resp.set_cookie('user', user_detail.user_id)
         resp.set_cookie('tea', user_detail.cookie)
         return resp
@@ -201,8 +202,8 @@ def add_front():
     _user = json.loads(user_db.user_detail(user.user_id))
     return render_template('add.html', user=_user)
 
-@app.route('/add/<user_id>', methods=['GET', 'POST'])
-def add_back(user_id):
+@app.route('/add/balance', methods=['GET', 'POST'])
+def add_back():
     user = jsontree.jsontree()
     user.user_id = request.cookies.get('user')
     user.user_cookie = request.cookies.get('tea')
@@ -211,10 +212,13 @@ def add_back(user_id):
     if(user.user_id == '' or user.user_cookie == '' or is_logged == 0):
         return render_template('home.html')
 
-    user_id_user1 = user.user_id
-    user_id_user2 = user_id
+    user.fellow_username = request.form['fellow_username']
+    user.amount = request.form['amount']
+    user.mod = request.form['mod']
 
-    #This is fucking incomplete !!
+    user_db.create_balance(user)
+
+    return redirect(url_for('home'))
 
 @app.route('/ajax/getname')
 def ajax_api_getname():
