@@ -5,7 +5,7 @@ import jsontree, json
 from datetime import datetime
 
 """
-Five Tables:
+Six Tables:
     1. Users -> Contains user details:
         userId: (it will generate here)
         username:
@@ -33,6 +33,12 @@ Five Tables:
     5. Cokiees -> sessions
         userId: 
         cookie:
+
+    6. Notification -> notification for users
+        noticeId:
+        userId:
+        notice:
+        unread: boolean
 
 """
 
@@ -234,6 +240,40 @@ class Database:
             self.debug_InternalError(e)
             cursor.close()
             sys.stdout.write(e)
+
+    def notification_table(self):
+
+        """
+        noticeId:
+        userId:
+        notice:
+        unread: boolean
+        """
+
+        query = """
+            CREATE TABLE IF NOT EXISTS notification (
+                id bigserial primary key,
+                noticeId varchar(36) NOT NULL,
+                userId varchar(36) NOT NULL,
+                notice varchar(100) NOT NULL,
+                unread boolean default True,
+                date_added timestamp default NULL
+            );
+        """
+
+        cursor = self.connection.cursor()
+        conn = self.connection
+
+        try:
+            cursor.execute(query)
+            conn.commit()
+            sys.stdout.write("created table notification.\n")
+
+        except Exception, e:
+            self.debug_InternalError(e)
+            sys.stdout.write(e)
+
+        cursor.close()
 
     def reset_connection(self):
         sys.stdout.write("Closing the connection.\n")

@@ -243,3 +243,21 @@ def ajax_api_getname():
     matching_names = user_db.matching_names(name)
 
     return matching_names
+
+@app.route('/notification')
+def notification():
+    user = jsontree.jsontree()
+    user.user_id = request.cookies.get('user')
+    user.user_cookie = request.cookies.get('tea')
+    is_logged = con.is_logged(user)
+
+    if(user.user_id == '' or user.user_cookie == '' or is_logged == 0):
+        return redirect(url_for('home'))
+
+    notice = user_db.notification(user.user_id)
+    notice = json.loads(notice)
+
+    if(notice.status == 0):
+        return render_template('error.html', msg=notice)
+
+    return render_template('notification.html', notice=notice)
