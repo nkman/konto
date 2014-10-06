@@ -1,0 +1,43 @@
+.notification-body{
+	position: relative;
+	margin-left: auto;
+	margin-right: auto;
+	width: 500px;
+	height: 550px;
+
+	/*border-style: solid;
+    border-width: 5px;*/
+}
+
+.notice{
+	height: 40px;
+	width: 250px;
+}
+
+#notice-message{
+	position: relative;
+	top: 15px;
+	text-align: left;
+}
+
+.notice-accept{
+	position: relative;
+	left: 250px;
+	bottom: 10px;
+}
+
+#notice-accept-button{
+	height: 30px;
+	width: 120px;
+}
+
+.notice-decline{
+	position: relative;
+	left: 380px;
+	bottom: 55px;
+}
+
+#notice-decline-button{
+	height: 30px;
+	width: 120px;
+}

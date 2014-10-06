@@ -15,9 +15,26 @@
                 &nbsp;&nbsp;&nbsp;<span><a href="/logout">Logout</a></span>
             </div>
     	</div>
+    	
     	<div class="remaining-body">
-    		<div>
+    		<div class="notification-body">
     			
+    			<div class="notice">
+    				<span id="notice-message">I'm Notice</span>
+    				<div class="notice-accept">
+    					<form method="post" action="/">
+    					<input type="hidden" name="id" value="Iamatpayphone">
+    					<input type="submit" id="notice-accept-button" name="decision" value="Accept">
+    					</form>
+    				</div>
+    				<div class="notice-decline">
+    					<form method="post" action="/">
+    					<input type="hidden" name="id" value="Iamatpayphone">
+    					<input type="submit" id="notice-decline-button" name="decision" value="Decline">
+    					</form>
+    				</div>
+    			</div>
+				    		
     		</div>
     	</div>
     </body>
