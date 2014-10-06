@@ -275,6 +275,11 @@ class User:
 
         error_msg = jsontree.jsontree()
         notice = jsontree.jsontree()
+        name = jsontree.jsontree()
+
+        name.positive = []
+        name.negetive = []
+        name.unread = []
 
         query = """
             SELECT accountId, userId1,
@@ -297,6 +302,24 @@ class User:
 
         notice.positive = result
 
+        for res in result:
+
+            query = """
+                SELECT firstname, lastname from address
+                WHERE userId = \'%s\'
+            """ % (res[2])
+
+            try:
+                cursor.execute(query)
+                result_name = cursor.fetchone()
+
+            except Exception, e:
+                error_msg.status = 0
+                error_msg.message = str(e)
+                return json.dumps(error_msg)
+
+            name.positive.append(result_name[0]+" "+result_name[1])
+
         query = """
             SELECT accountId, userId1,
             userId2, balance
@@ -316,6 +339,24 @@ class User:
 
         notice.negetive = result
 
+        for res in result:
+
+            query = """
+                SELECT firstname, lastname from address
+                WHERE userId = \'%s\'
+            """ % (res[1])
+
+            try:
+                cursor.execute(query)
+                result_name = cursor.fetchone()
+
+            except Exception, e:
+                error_msg.status = 0
+                error_msg.message = str(e)
+                return json.dumps(error_msg)
+
+            name.negetive.append(result_name[0]+" "+result_name[1])
+
         query = """
             SELECT noticeId, userId,
             notice FROM notification WHERE
@@ -333,6 +374,7 @@ class User:
             return json.dumps(error_msg)
 
         notice.unread = result
+        notice.name = name
         notice.status = 1
 
         notice = json.dumps(notice)

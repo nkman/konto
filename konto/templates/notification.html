@@ -19,9 +19,10 @@
         <div class="remaining-body">
             <div class="notification-body">
 
+                {% set i = 0 %}
                 {% for item in notice.positive %}
                 <div class="notice">
-                    <span id="notice-message">You owe *name* {{ item[3] }}</span>
+                    <span id="notice-message">You owe {{ notice.name.positive[i] }} {{ item[3] }}</span>
                     <div class="notice-accept">
                         <form method="post" action="/">
                         <input type="hidden" name="account_id" value="{{ item[0] }}">
@@ -35,11 +36,13 @@
                         </form>
                     </div>
                 </div>
+                {% set i = i+1 %}
                 {% endfor %}
 
+                {% set i = 0 %}
                 {% for item in notice.negetive %}
                 <div class="notice">
-                    <span id="notice-message">*name* ows you {{ item[3] }}</span>
+                    <span id="notice-message">{{ notice.name.negetive[i] }} ows you {{ item[3] }}</span>
                     <div class="notice-accept">
                         <form method="post" action="/">
                         <input type="hidden" name="account_id" value="{{ item[0] }}">
@@ -53,6 +56,7 @@
                         </form>
                     </div>
                 </div>
+                {% set i = i+1 %}
                 {% endfor %}
 
                 {% for item in notice.unread %}
