@@ -277,7 +277,9 @@ class User:
         notice = jsontree.jsontree()
 
         query = """
-            SELECT * FROM account WHERE
+            SELECT accountId, userId1,
+            userId2, balance
+            FROM account WHERE
             userId1 = \'%s\' AND 
             confirmed_by_user1 = \'%s\'
         """ % (user_id, False)
@@ -296,7 +298,9 @@ class User:
         notice.positive = result
 
         query = """
-            SELECT * FROM account WHERE
+            SELECT accountId, userId1,
+            userId2, balance
+            FROM account WHERE
             userId2 = \'%s\' AND 
             confirmed_by_user2 = \'%s\'
         """ % (user_id, False)
@@ -313,7 +317,8 @@ class User:
         notice.negetive = result
 
         query = """
-            SELECT * FROM notification WHERE
+            SELECT noticeId, userId,
+            notice FROM notification WHERE
             userId = \'%s\' AND 
             unread = \'%s\'
         """ % (user_id, True)

@@ -8,34 +8,65 @@
     </head>
 
     <body>
-    	<div class="home-top-header">
-    		<div class="top-links">
+        <div class="home-top-header">
+            <div class="top-links">
                 <span><a href="/profile/{{ user.username }}">{{ user.firstname }} {{ user.lastname }}</a></span>
                 &nbsp;&nbsp;&nbsp;<span><a href="/">Home</a></span>
                 &nbsp;&nbsp;&nbsp;<span><a href="/logout">Logout</a></span>
             </div>
-    	</div>
-    	
-    	<div class="remaining-body">
-    		<div class="notification-body">
-    			
-    			<div class="notice">
-    				<span id="notice-message">I'm Notice</span>
-    				<div class="notice-accept">
-    					<form method="post" action="/">
-    					<input type="hidden" name="id" value="Iamatpayphone">
-    					<input type="submit" id="notice-accept-button" name="decision" value="Accept">
-    					</form>
-    				</div>
-    				<div class="notice-decline">
-    					<form method="post" action="/">
-    					<input type="hidden" name="id" value="Iamatpayphone">
-    					<input type="submit" id="notice-decline-button" name="decision" value="Decline">
-    					</form>
-    				</div>
-    			</div>
-				    		
-    		</div>
-    	</div>
+        </div>
+        
+        <div class="remaining-body">
+            <div class="notification-body">
+
+                {% for item in notice.positive %}
+                <div class="notice">
+                    <span id="notice-message">You owe *name* {{ item[3] }}</span>
+                    <div class="notice-accept">
+                        <form method="post" action="/">
+                        <input type="hidden" name="account_id" value="{{ item[0] }}">
+                        <input type="submit" id="notice-accept-button" name="decision" value="Accept">
+                        </form>
+                    </div>
+                    <div class="notice-decline">
+                        <form method="post" action="/">
+                        <input type="hidden" name="account_id" value="{{ item[0] }}">
+                        <input type="submit" id="notice-decline-button" name="decision" value="Decline">
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% for item in notice.negetive %}
+                <div class="notice">
+                    <span id="notice-message">*name* ows you {{ item[3] }}</span>
+                    <div class="notice-accept">
+                        <form method="post" action="/">
+                        <input type="hidden" name="account_id" value="{{ item[0] }}">
+                        <input type="submit" id="notice-accept-button" name="decision" value="Accept">
+                        </form>
+                    </div>
+                    <div class="notice-decline">
+                        <form method="post" action="/">
+                        <input type="hidden" name="account_id" value="{{ item[0] }}">
+                        <input type="submit" id="notice-decline-button" name="decision" value="Decline">
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% for item in notice.unread %}
+                <div class="notice">
+                    <span id="notice-message">{{ item[2] }}</span>
+                    <div class="notice-accept">
+                        <form method="post" action="/">
+                        <input type="hidden" name="id" value="{{ item[0] }}">
+                        <input type="submit" id="notice-okay-button" name="decision" value="Okay">
+                        </form>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     </body>
    </html>
