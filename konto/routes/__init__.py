@@ -245,7 +245,7 @@ def ajax_api_getname():
 
     return matching_names
 
-@app.route('/notification')
+@app.route('/notification', methods=['GET', 'POST'])
 def notification():
     user = jsontree.jsontree()
     user.user_id = request.cookies.get('user')
@@ -268,3 +268,36 @@ def notification():
         return render_template('error.html', msg=notice)
 
     return render_template('notification.html', notice=notice, user=_user)
+
+@app.route('/notification/read', methods=['GET', 'POST'])
+def read():
+    user = jsontree.jsontree()
+    user.user_id = request.cookies.get('user')
+    user.user_cookie = request.cookies.get('tea')
+    is_logged = con.is_logged(user)
+
+    if(user.user_id == '' or user.user_cookie == '' or is_logged == 0):
+        return redirect(url_for('home'))
+
+    notice_id = request.form['notice_id']
+    user_db.mark_notification_read(notice_id)
+
+    return redirect(url_for('notification'))
+
+@app.route('/notification/accept', methods=['GET', 'POST'])
+def notification_accept():
+    user = jsontree.jsontree()
+    user.user_id = request.cookies.get('user')
+    user.user_cookie = request.cookies.get('tea')
+    is_logged = con.is_logged(user)
+
+    if(user.user_id == '' or user.user_cookie == '' or is_logged == 0):
+        return redirect(url_for('home'))
+
+    user.account_id = request.form['account_id']
+    user.decision = request.form['decision']
+
+    if(user.decision == 'Accept'):
+        user_db.mark_accept(user)
+
+    return redirect(url_for('notification'))

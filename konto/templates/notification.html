@@ -4,7 +4,6 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home.css')}}">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css')}}">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/notification.css')}}">
-        <script src="{{ url_for('static', filename='js/konto.js')}}"></script>
     </head>
 
     <body>
@@ -44,13 +43,13 @@
                 <div class="notice">
                     <span id="notice-message">{{ notice.name.negetive[i] }} ows you {{ item[3] }}</span>
                     <div class="notice-accept">
-                        <form method="post" action="/">
+                        <form method="post" action="/notification/accept">
                         <input type="hidden" name="account_id" value="{{ item[0] }}">
                         <input type="submit" id="notice-accept-button" name="decision" value="Accept">
                         </form>
                     </div>
                     <div class="notice-decline">
-                        <form method="post" action="/">
+                        <form method="post" action="/notification/decline">
                         <input type="hidden" name="account_id" value="{{ item[0] }}">
                         <input type="submit" id="notice-decline-button" name="decision" value="Decline">
                         </form>
@@ -63,8 +62,8 @@
                 <div class="notice">
                     <span id="notice-message">{{ item[2] }}</span>
                     <div class="notice-accept">
-                        <form method="post" action="/">
-                        <input type="hidden" name="id" value="{{ item[0] }}">
+                        <form method="post" action="/notification/read">
+                        <input type="hidden" name="notice_id" value="{{ item[0] }}">
                         <input type="submit" id="notice-okay-button" name="decision" value="Okay">
                         </form>
                     </form>
@@ -73,4 +72,4 @@
             </div>
         </div>
     </body>
-   </html>
+</html>

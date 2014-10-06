@@ -2,8 +2,10 @@
 	position: relative;
 	margin-left: auto;
 	margin-right: auto;
-	width: 500px;
+	width: 540px;
 	height: 550px;
+	overflow-y: scroll;
+	overflow-x: hidden;
 
 	/*border-style: solid;
     border-width: 5px;*/

@@ -373,9 +373,36 @@ class User:
             error_msg.message = str(e)
             return json.dumps(error_msg)
 
+        cursor.close()
         notice.unread = result
         notice.name = name
         notice.status = 1
 
         notice = json.dumps(notice)
         return notice
+
+    def mark_notification_read(self, notice_id):
+
+        query = """
+            UPDATE notification SET
+            unread = \'%s\' WHERE
+            noticeId = \'%s\'
+        """ % (False, notice_id)
+
+        con = self.con
+        cursor = con.cursor()
+
+        try:
+            cursor.execute(query)
+            con.commit()
+
+        except Exception, e:
+            raise e
+
+        return 1
+
+    def mark_accept(self, user):
+
+        #make notification for other user.
+        #update database.
+        pass
