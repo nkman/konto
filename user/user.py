@@ -1,6 +1,8 @@
 import sys
 import jsontree, json
 from db import database
+from datetime import datetime
+import uuid
 
 class User:
 
@@ -210,7 +212,7 @@ class User:
             return json.dumps(error_msg)
 
         query = """
-            SELECT * FROM account
+            SELECT balance FROM account
             WHERE userId2 = \'%s\' AND
             confirmed_by_user1 = True AND 
             confirmed_by_user2 = True
@@ -230,10 +232,10 @@ class User:
         account_detail.current_balance = 0
 
         for acc in result1:
-            account_detail.current_balance += int(acc['balance'])
+            account_detail.current_balance += int(acc[0])
 
         for acc in result2:
-            account_detail.current_balance -= int(acc['balance'])
+            account_detail.current_balance -= int(acc[0])
 
         account_detail.status = 1
         account_detail.positive = result1
@@ -403,6 +405,83 @@ class User:
 
     def mark_accept(self, user):
 
-        #make notification for other user.
-        #update database.
-        pass
+        error_msg = jsontree.jsontree()
+
+        account_id = user.account_id
+        user_id = user.user_id
+
+        query = """
+            SELECT userId1, userId2 FROM account
+            WHERE accountId = \'%s\'
+        """ % (account_id)
+
+        con = self.con
+        cursor = con.cursor()
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchone()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = str(e)
+            error_msg = json.dumps(error_msg)
+            return error_msg
+
+        if(result == None):
+            error_msg.status = 0
+            error_msg.message = "Transaction not found."
+            error_msg = json.dumps(error_msg)
+            return error_msg
+
+        if(result[0] == user_id):
+
+            userId = result[1]
+            update_db_query = """
+                UPDATE account SET confirmed_by_user1 = \'%s\' WHERE
+                accountId = \'%s\'
+            """ % (True, account_id)
+
+        else:
+
+            userId = result[0]
+            update_db_query = """
+                UPDATE account SET confirmed_by_user2 = \'%s\' WHERE
+                accountId = \'%s\'
+            """ % (True, account_id)
+
+        name = self.firstname_lastname(user_id)
+        notice = name.firstname+" "+name.lastname+" accepted the deal" #Modi--fy this line.
+        date_added = datetime.now()
+        noticeId = str(uuid.uuid1())
+
+        query = """
+            INSERT INTO notification (
+            noticeId, userId, notice, date_added)
+            VALUES (\'%s\', \'%s\', \'%s\', \'%s\')
+        """ % (noticeId, userId, notice, date_added)
+
+        try:
+            cursor.execute(query)
+            con.commit()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = str(e)
+            error_msg = json.dumps(error_msg)
+            return error_msg
+
+        try:
+            cursor.execute(update_db_query)
+            con.commit()
+            cursor.close()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = str(e)
+            error_msg = json.dumps(error_msg)
+            return error_msg
+
+        error_msg.status = 1
+        error_msg = json.dumps(error_msg)
+        return error_msg

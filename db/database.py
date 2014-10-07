@@ -288,12 +288,12 @@ class Database:
     def drop_all(self):
         
         query = [
-            'DROP TABLE users', 
-            'DROP TABLE account', 
-            'DROP TABLE address',
-            'DROP TABLE cookie',
-            'DROP TABLE mid',
-            'DROP TABLE notification'
+            'DROP TABLE IF EXISTS users', 
+            'DROP TABLE IF EXISTS account', 
+            'DROP TABLE IF EXISTS address',
+            'DROP TABLE IF EXISTS cookie',
+            'DROP TABLE IF EXISTS mid',
+            'DROP TABLE IF EXISTS notification'
             ]
 
         conn = self.connection
@@ -417,13 +417,10 @@ class Database:
         try:
             cursor.execute(query)
         except Exception, e:
-            if (e == 'InternalError'):
-                self.reset_connection()
+            self.debug_InternalError(e)
 
             msg.status = 0
-            # msg.message = "Unable to commit create address query !!"
             msg.message = str(e)
-            return msg #how to handle this -> rollbacks ?
 
         date_added = datetime.now()
         userId = cursor.fetchone()[0]
@@ -442,17 +439,15 @@ class Database:
             sys.stdout.write("New adderss created !")
             cursor.close()
             msg.status = 1
-            msg.message = "whatever"
             return msg
 
         except Exception, e:
             self.debug_InternalError(e)
             cursor.close()
             msg.status = 0
-            # msg.message = "Unable to commit create address query !!"
             sys.stdout.write(e)
             msg.message = str(e)
-            return msg #how to handle this -> rollbacks ?
+            return msg
 
     def is_logged(self, user):
 
@@ -502,8 +497,12 @@ class Database:
         except Exception, e:
             self.debug_InternalError(e)
             sys.stdout.write(e)
+            msg.status = 0
+            msg.message = e
+            return msg
 
         msg = jsontree.jsontree()
+
         if(result == None):
             msg.status = 0
             msg.message = "No such user exists !!"
