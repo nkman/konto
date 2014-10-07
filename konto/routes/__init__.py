@@ -301,3 +301,22 @@ def notification_accept():
         user_db.mark_accept(user)
 
     return redirect(url_for('notification'))
+
+@app.route('/notification/decline', methods=['GET', 'POST'])
+def notification_decline():
+
+    user = jsontree.jsontree()
+    user.user_id = request.cookies.get('user')
+    user.user_cookie = request.cookies.get('tea')
+    is_logged = con.is_logged(user)
+
+    if(user.user_id == '' or user.user_cookie == '' or is_logged == 0):
+        return redirect(url_for('home'))
+
+    user.account_id = request.form['account_id']
+    user.decision = request.form['decision']
+
+    if(user.decision == 'Decline'):
+        user_db.mark_decline(user)
+
+    return redirect(url_for('notification'))
