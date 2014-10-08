@@ -93,7 +93,13 @@ def signup():
     if(user.phone == ''):
         user.phone = None
 
-    return json.dumps(con.create_user(user))
+    c = con.create_user(user)
+    c = json.loads(c)
+
+    if(c['status'] == 0):
+        return render_template('error.html', msg=c)
+    else:
+        return redirect(url_for('home'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -224,8 +230,13 @@ def add_back(username=None):
     user.amount = request.form['amount']
     user.mod = request.form['sign']
 
-    user_db.create_balance(user)
+    c = user_db.create_balance(user)
+    c = json.loads(c)
 
+    _user = json.loads(user_db.user_detail(user.user_id))
+
+    if(c['status'] == 0):
+        return render_template('error.html', msg=c, user=_user)
     return redirect(url_for('home'))
 
 @app.route('/ajax/getname')

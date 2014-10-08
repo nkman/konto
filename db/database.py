@@ -344,11 +344,12 @@ class Database:
         username = user['username']
         password = user['password']
 
+        msg = jsontree.jsontree()
+
         if(self.user_found(username) == 1):
-            msg = jsontree.jsontree()
             msg.status = 0
             msg.message = "username exists !!"
-            return msg
+            return json.dumps(msg)
 
         _id = uuid.uuid1()
         date_added = datetime.now()
@@ -360,8 +361,6 @@ class Database:
 
         cursor = self.connection.cursor()
         conn = self.connection
-
-        msg = jsontree.jsontree()
 
         try:
             cursor.execute(query)   
@@ -376,7 +375,7 @@ class Database:
             cursor.close()
             msg.status = 0
             msg.message = "user creation failed !!"
-            return msg
+            return json.dumps(msg)
 
         try:
             msg = self.create_address(user)
@@ -386,15 +385,15 @@ class Database:
             sys.stdout.write(e)
             msg.status = 0
             msg.message = "user address creation failed !!"
-            return msg
+            return json.dumps(msg)
 
-        if (msg.status == 1):
-            msg.message = "user and user address created successfully !!"
-        else:
-            msg.message = "user created but adderss creation failed !!"
+        # if (msg.status == 1):
+        #     msg.message = "user and user address created successfully !!"
+        # else:
+        #     msg.message = "user created but adderss creation failed !!"
             #delete_created_user()
 
-        return msg
+        return json.dumps(msg)
 
     def create_address(self, user):
 
@@ -421,6 +420,7 @@ class Database:
 
             msg.status = 0
             msg.message = str(e)
+            return msg
 
         date_added = datetime.now()
         userId = cursor.fetchone()[0]
@@ -570,7 +570,7 @@ class Database:
             msg.message = e
             sys.stdout.write(e)
 
-        return msg
+        return json.dumps(msg)
 
     def insert_into_account_table(self, account):
 
@@ -616,7 +616,7 @@ class Database:
             msg.message = e
             sys.stdout.write()
 
-        return msg
+        return json.dumps(msg)
 
     def debug_InternalError(self, e):
 
