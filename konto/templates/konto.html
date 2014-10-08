@@ -35,9 +35,9 @@
                         <span>{{ item[3] }}</span>
                     </div>
                     <div class="delete-positive">
-                        <form>
+                        <form action="/notification/delete" method="post">
                             <input type="hidden" name="account_id" value="{{ item[0] }}">
-                            <input type="submit" id="positive-button" value="Delete">
+                            <input type="submit" id="positive-button" value="Delete" name="mod">
                         </form>
                     </div>
                 </div>

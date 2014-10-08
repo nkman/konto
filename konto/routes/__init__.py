@@ -39,6 +39,7 @@ def home():
     return render_template('konto.html', user=_user, account=_account)
 
 
+"""
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     try:
@@ -54,7 +55,7 @@ def admin():
     except Exception, e:
         print e
         raise e
-    
+"""
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -331,3 +332,28 @@ def notification_decline():
         user_db.mark_decline(user)
 
     return redirect(url_for('notification'))
+
+@app.route('/notification/delete', methods=['GET', 'POST'])
+def notification_delete():
+
+    user = jsontree.jsontree()
+    user.user_id = request.cookies.get('user')
+    user.user_cookie = request.cookies.get('tea')
+    is_logged = con.is_logged(user)
+
+    if(user.user_id == '' or user.user_cookie == '' or is_logged == 0):
+        return redirect(url_for('home'))
+
+    user.account_id = request.form['account_id']
+    decision = request.form['mod']
+
+    if(decision == 'Delete'):
+        c = user_db.del_user_transaction(user)
+    else:
+        return redirect(url_for('notification'))
+
+    c = json.loads(c)
+    if(c['status'] == 0):
+        return render_template('error.html', msg=c)
+
+    return redirect(url_for('home'))

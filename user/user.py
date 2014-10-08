@@ -571,3 +571,49 @@ class User:
         error_msg.status = 1
         error_msg = json.dumps(error_msg)
         return error_msg
+
+    def del_user_transaction(self, user):
+
+        error_msg = jsontree.jsontree()
+        account_id = user.account_id
+        user_id = user.user_id
+
+        query = """
+            SELECT userId1 FROM account
+            WHERE accountId = \'%s\'
+        """ % (account_id)
+
+        con = self.con
+        cursor = con.cursor()
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchone()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = str(e)
+            return json.dumps(error_msg)
+
+        query = """
+            DELETE FROM account
+            WHERE accountId = \'%s\'
+        """ % (account_id)
+
+        if(result[0] != user_id):
+            error_msg.status = 0
+            error_msg.message = "You do not have right to modify that !!"
+            return json.dumps(error_msg)
+
+        try:
+            cursor.execute(query)
+            con.commit()
+            cursor.close()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = str(e)
+            return json.dumps(error_msg)
+
+        error_msg.status = 1
+        return json.dumps(error_msg)
