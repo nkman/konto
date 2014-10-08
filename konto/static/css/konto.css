@@ -59,5 +59,34 @@ a{
 	position: relative;
 	top: 10px;
 	height: 40px;
-	width: 250px;
+	width: 667px;
+}
+
+.positive-name{
+	position: relative;
+	top: 10px;
+	left: 30px;
+	font-size: 20px;
+	width: 192px;
+}
+
+.positive-amount{
+	text-align: center;
+	font-size:20px;
+	position: relative;
+	left: 222px;
+	width: 222px;
+	bottom: 10px;
+}
+
+.delete-positive{
+	position: relative;
+	left: 444px;
+	width: 223px;
+	bottom: 35px;
+}
+
+#positive-button{
+	height: 30px;
+	width: 120px;
 }

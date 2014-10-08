@@ -193,7 +193,8 @@ class User:
         account_detail = jsontree.jsontree()
 
         query = """
-            SELECT balance FROM account
+            SELECT accountId, userId1, userId2, balance
+            FROM account
             WHERE userId1 = \'%s\' AND
             confirmed_by_user1 = True AND 
             confirmed_by_user2 = True
@@ -204,6 +205,7 @@ class User:
         try:
             cursor.execute(query)
             result1 = cursor.fetchall()
+            print result1
 
         except Exception, e:
             error_msg.status = 0
@@ -212,7 +214,8 @@ class User:
             return json.dumps(error_msg)
 
         query = """
-            SELECT balance FROM account
+            SELECT accountId, userId1, userId2, balance
+            FROM account
             WHERE userId2 = \'%s\' AND
             confirmed_by_user1 = True AND 
             confirmed_by_user2 = True
@@ -230,12 +233,18 @@ class User:
             return json.dumps(error_msg)
 
         account_detail.current_balance = 0
+        account_detail.positive_name = []
+        account_detail.negetive_name = []
 
         for acc in result1:
-            account_detail.current_balance += int(acc[0])
+            account_detail.current_balance += int(acc[3])
+            name = self.firstname_lastname(acc[2])
+            account_detail.positive_name.append(name.firstname+" "+name.lastname)
 
         for acc in result2:
-            account_detail.current_balance -= int(acc[0])
+            account_detail.current_balance -= int(acc[3])
+            name = self.firstname_lastname(acc[1])
+            account_detail.negetive_name.append(name.firstname+" "+name.lastname)
 
         account_detail.status = 1
         account_detail.positive = result1
