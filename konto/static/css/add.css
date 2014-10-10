@@ -29,3 +29,7 @@
 	width: 100px;
 	transform: translate(100px, -23px);
 }
+
+a{
+	text-decoration: none;
+}

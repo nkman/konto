@@ -1,6 +1,11 @@
 body{
 	overflow-x: hidden;
 }
+
+a{
+	text-decoration: none;
+}
+
 .remaining-body{
 	height: 550px;
 	width: auto;

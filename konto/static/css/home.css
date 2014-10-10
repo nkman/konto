@@ -33,3 +33,14 @@
 	top: -300px;
 	visibility: hidden;
 }
+
+.notification{
+	position: relative;
+	bottom: 8px;
+	left: 10px;
+	width: 100px;
+}
+
+a{
+	text-decoration: none;
+}
