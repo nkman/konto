@@ -357,3 +357,7 @@ def notification_delete():
         return render_template('error.html', msg=c)
 
     return redirect(url_for('home'))
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
