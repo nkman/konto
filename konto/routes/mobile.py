@@ -10,35 +10,27 @@ from db import database
 from user import user
 
 configuration = config.config()
+api_key = configuration['API']
+
 con = database.Database(configuration)
 con.connect()
 
 user_db = user.User(configuration)
 
-@app.route('/mobile')
+@app.route('/mobile', methods=['POST'])
 def mobile_home_page():
     return "Hello Cruel World!!"
 
-@app.route('/mobile/signup')
+@app.route('/mobile/signup', methods=['POST'])
 def mobile_user_signup():
     error_msg = jsontree.jsontree()
 
     if (request.method == 'GET'):
         error_msg.status = 0
         error_msg.message = "Method Not Allowed !!"
-        return render_template("error.html", msg=error_msg)
+        return json.dumps(error_msg)
 
     user = define_user(request)
-
-    if(user.username == '' or user.password == '' or user.firstname == ''):
-        error_msg.status = 0
-        error_msg.message = "Some credentials missing"
-        return json.dumps(error_msg)
-
-    elif(user.lastname == ''):
-        error_msg.status = 0
-        error_msg.message = "Lastname is missing"
-        return json.dumps(error_msg)
 
     if(user.phone == ''):
         user.phone = None
@@ -64,10 +56,12 @@ def define_user(request):
     user.firstname = request.form['firstname']
     user.lastname = request.form['lastname']
     user.phone = request.form['phone']
+    user.api = request.headers['Authorization']
 
     return user
 
 def text_security(text):
+
     TEXTS = ["SELECT", "UPDATE", "DROP", "MODIFY",
             "ALTER", "!", "#", "%", "&", "(", ")"]
 
@@ -75,9 +69,36 @@ def text_security(text):
     firstname = text.firstname
     lastname = text.lastname
     phone = text.phone
+    password = text.password
+    api = text.api
 
     error_msg = jsontree.jsontree()
     error_msg.status = 1
+
+    if(username == ''):
+        error_msg.status = 0
+        error_msg.message = "Username missing"
+        return error_msg
+
+    elif(password == ''):
+        error_msg.status = 0
+        error_msg.message = "Password missing"
+        return error_msg
+
+    elif(firstname == ''):
+        error_msg.status = 0
+        error_msg.message = "Firstname missing"
+        return error_msg
+
+    elif(lastname == ''):
+        error_msg.status = 0
+        error_msg.message = "Lastname is missing"
+        return error_msg
+
+    if(api != api_key):
+        error_msg.status = 0
+        error_msg.message = "You are not allowed here !!"
+        return error_msg
 
     for i in TEXTS:
         if (username.count(i) > 0):
