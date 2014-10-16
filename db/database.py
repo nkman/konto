@@ -488,7 +488,8 @@ class Database:
         """ % (username)
 
         cursor = self.connection.cursor()
-
+        msg = jsontree.jsontree()
+        
         try:
             cursor.execute(query)
             result = cursor.fetchone()
@@ -500,8 +501,6 @@ class Database:
             msg.status = 0
             msg.message = e
             return msg
-
-        msg = jsontree.jsontree()
 
         if(result == None):
             msg.status = 0
