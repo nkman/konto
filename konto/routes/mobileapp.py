@@ -21,6 +21,36 @@ user_db = user.User(configuration)
 def mobile_home_page():
     return "Hello Cruel World!!"
 
+
+"""
+This route for signup.
+
+send the following:
+
+    in form:
+        username
+        firstname
+        lastname
+        password
+        phone
+
+    in header:
+        Authorization
+
+It will response as:
+
+{
+    status: 1
+}
+
+or
+
+{
+    status: 0,
+    message: "REASON_FOR_THIS"
+}
+
+"""
 @app.route('/mobile/signup', methods=['POST'])
 def mobile_user_signup():
     error_msg = jsontree.jsontree()
@@ -123,6 +153,34 @@ def signup_text_security(text):
 
     return error_msg
 
+"""
+This route for login
+send the following:
+
+    in form:
+        username
+        password
+
+    in header:
+        Authorization
+
+    it will return the json of userdata as
+
+    {   
+        status: 1,
+        username: "nkman",
+        firstname: "Nairitya",
+        lastname: "Khilari"
+    } 
+
+    or
+
+    {
+        status: 0,
+        message: "USER_NOT_FOUND"
+    }
+
+"""
 @app.route('/mobile/login')
 def mobile_user_login():
 
