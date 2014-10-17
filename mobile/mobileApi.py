@@ -303,3 +303,33 @@ class Mobile:
             user.status = 0
 
         return user
+
+    def is_logged(self, user_id, user_cookie):
+
+        query = """
+            SELECT userId, cookie FROM cookie WHERE cookie=\'%s\'
+        """ % (user_cookie)
+
+        cursor = self.connection.cursor()
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchone()
+            cursor.close()
+
+        except Exception, e:
+            self.restart_connection()
+            sys.stdout.write(e)
+            return 0
+
+        if(result == None):
+            return 0
+
+        elif (result[0] != user_id):
+            return 0
+
+        elif (result[0] == user_id):
+            return 1
+
+        else:
+            return 0

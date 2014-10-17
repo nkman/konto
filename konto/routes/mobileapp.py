@@ -136,8 +136,34 @@ def mobile_user_login():
     cookie = con.set_cookie_to_user(c.user_id)
 
     if(cookie.status == 0):
-        resp.set_cookie("user", "Temporary account access !")
+        resp.set_cookie("tea", "Temporary account access !")
     else:
-        resp.set_cookie('user', cookie.cookie)
+        resp.set_cookie('tea', cookie.cookie)
 
+    resp.set_cookie('user', c.user_id)
     return resp
+
+
+"""
+Notification API's
+
+GET:
+    unread: 0
+    count: 0
+
+To Return:
+    {[
+
+    ]}
+"""
+@app.route('/mobile/notification', methods=['POST'])
+def get_notification():
+
+    user_id = request.cookies.get('user')
+    logged_in = is_logged_in(result, user_id, request.cookies.get('tea'))
+
+    unread = request.form['unread']
+    count = request.form['count']
+
+    
+
