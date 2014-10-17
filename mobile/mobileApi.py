@@ -59,7 +59,7 @@ class Mobile:
 
         elif(result[0] == password):
             error_msg.status = 1
-            error_msg.userId = result[1]
+            error_msg.user_id = result[1]
             error_msg.username = username
 
         else:
@@ -193,3 +193,86 @@ class Mobile:
         cursor.close()
         return msg
 
+    def user_login(self, user_id):
+        return self.user_detail(user_id)
+
+
+    def user_detail(self, user_id):
+        user = jsontree.jsontree()
+
+        firstname_lastname = self.firstname_lastname(user_id)
+
+        if(firstname_lastname.status == 1):
+            user.firstname = firstname_lastname.firstname
+            user.lastname = firstname_lastname.lastname
+            user.user_id = user_id
+
+        else:
+            user.status = 0
+            return json.dumps(user)
+
+        username = self.username(user_id)
+
+        if(username.status == 1):
+            user.username = username.username
+
+        else:
+            user.status = 0
+            return json.dumps(user)
+
+        user.status = 1
+        return json.dumps(user)
+
+    def firstname_lastname(self, user_id):
+
+        con = self.connection
+        user = jsontree.jsontree()
+
+        query = """
+            SELECT firstname, lastname FROM address WHERE
+            userId=\'%s\'
+        """ % (user_id)
+
+        cursor = con.cursor()
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchone()
+            cursor.close()
+
+        except Exception, e:
+            user.status = 0
+            user.message = e
+            return user
+
+        user.status = 1
+        user.user_id = user_id
+        user.firstname = result[0]
+        user.lastname = result[1]
+
+        return user
+
+    def username(self, user_id):
+        con = self.connection
+        user = jsontree.jsontree()
+
+        query = """
+            SELECT username FROM users WHERE 
+            userId=\'%s\'
+        """ % (user_id)
+        cursor = con.cursor()
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchone()
+            cursor.close()
+
+        except Exception, e:
+            user.status = 0
+            user.message = str(e)
+            return user
+
+        user.status = 1
+        user.username = result[0]
+
+        return user

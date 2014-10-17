@@ -113,7 +113,7 @@ class Function:
             error_msg.message = "Password missing"
             return error_msg
 
-        if(api != api_key):
+        if(api != self.api_key):
             error_msg.status = 0
             error_msg.message = "You should not be here !!"
             return error_msg

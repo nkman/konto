@@ -114,7 +114,7 @@ send the following:
     }
 
 """
-@app.route('/mobile/login')
+@app.route('/mobile/login', methods=['POST'])
 def mobile_user_login():
 
     user = function.define_user_login(request)
@@ -124,10 +124,14 @@ def mobile_user_login():
     if(error_msg.status == 0):
         return json.dumps(error_msg)
 
-    c = con.create_user(user)
-    c = json.loads(c)
+    c = con.verify_user(user)
 
-    if(c['status'] == 0):
+    if(c.status == 0):
         return json.dumps(c)
-    else:
-        return json.dumps(c)
+
+    result = con.user_login(c.user_id)
+    result = json.dumps(result)
+
+    resp = make_response(result)
+    resp.set_cookie('user', '123')
+    return resp
