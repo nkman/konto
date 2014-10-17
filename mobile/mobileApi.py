@@ -1,5 +1,7 @@
-import psycopg2
-import jsontree
+import sys, os
+import psycopg2, uuid
+import jsontree, json
+from datetime import datetime
 
 class Mobile:
 
@@ -21,6 +23,11 @@ class Mobile:
         )
         self.connection = connection
         return connection
+
+    def restart_connection(self):
+        self.connection.close()
+        self.connect()
+        sys.stdout.write("Restarted the connection !!")
 
     def verify_user(self, user):
 
@@ -70,7 +77,7 @@ class Mobile:
             cursor.execute(query)
 
         except Exception, e:
-            self.debug_InternalError(e)
+            self.restart_connection()
             sys.stdout.write(e)
 
         result = cursor.fetchone()
@@ -107,13 +114,11 @@ class Mobile:
         conn = self.connection
 
         try:
-            cursor.execute(query)   
-            conn.commit()
-            sys.stdout.write("New user created")
+            cursor.execute(query)
             cursor.close()
 
         except Exception, e:
-            self.debug_InternalError(e)
+            self.restart_connection()
 
             sys.stdout.write(e)
             cursor.close()
@@ -122,10 +127,10 @@ class Mobile:
             return json.dumps(msg)
 
         try:
-            msg = self.create_address(user)
+            msg = self.create_address(user, conn)
 
         except Exception, e:
-            self.debug_InternalError(e)
+            self.restart_connection()
             sys.stdout.write(e)
             msg.status = 0
             msg.message = "user address creation failed !!"
@@ -139,7 +144,7 @@ class Mobile:
 
         return json.dumps(msg)
 
-    def create_address(self, user):
+    def create_address(self, user, conn):
 
         username = user['username']
         firstname = user['firstname']
@@ -152,8 +157,7 @@ class Mobile:
             SELECT userId FROM users WHERE username=\'%s\'
         """ % username
 
-        cursor = self.connection.cursor()
-        conn = self.connection
+        cursor = conn.cursor()
 
         msg = jsontree.jsontree()
 
@@ -168,28 +172,24 @@ class Mobile:
 
         date_added = datetime.now()
         userId = cursor.fetchone()[0]
-        cursor.close()
 
         query = """
             INSERT INTO address(addressId, userId, firstname, lastname, phone, date_added)
             VALUES (\'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%s\')
         """ % (str(_id), userId, firstname, lastname, phone, date_added)
 
-        cursor = conn.cursor()
-
         try:
             cursor.execute(query)
             conn.commit()
             sys.stdout.write("New adderss created !")
-            cursor.close()
             msg.status = 1
-            return msg
 
         except Exception, e:
-            self.debug_InternalError(e)
-            cursor.close()
+            self.restart_connection()
             msg.status = 0
             sys.stdout.write(e)
             msg.message = str(e)
-            return msg
+        
+        cursor.close()
+        return msg
 
