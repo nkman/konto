@@ -276,3 +276,30 @@ class Mobile:
         user.username = result[0]
 
         return user
+
+    def set_cookie_to_user(self, user_id):
+
+        user = jsontree.jsontree()
+        date_added = datetime.now()
+        user.cookie = str(uuid.uuid1())
+
+        query = """
+            INSERT INTO cookie (userId, cookie, date_added) 
+            VALUES (\'%s\', \'%s\', \'%s\')
+        """ % (user_id, user.cookie, date_added)
+
+        conn = self.connection
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(query)
+            conn.commit()
+            cursor.close()
+            user.status = 1
+
+        except Exception, e:
+            self.restart_connection()
+            sys.stdout.write(str(e))
+            user.status = 0
+
+        return user

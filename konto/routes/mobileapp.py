@@ -131,7 +131,13 @@ def mobile_user_login():
 
     result = con.user_login(c.user_id)
     result = json.dumps(result)
-
     resp = make_response(result)
-    resp.set_cookie('user', '123')
+
+    cookie = con.set_cookie_to_user(c.user_id)
+
+    if(cookie.status == 0):
+        resp.set_cookie("user", "Temporary account access !")
+    else:
+        resp.set_cookie('user', cookie.cookie)
+
     return resp
