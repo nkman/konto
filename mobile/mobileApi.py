@@ -1,4 +1,5 @@
 import psycopg2
+import jsontree
 
 class Mobile:
 
@@ -58,7 +59,29 @@ class Mobile:
             error_msg.status = 0
             error_msg.message = "Wrong password."
 
-        return msg
+        return error_msg
+
+    def user_already_exists(self, username):
+
+        query = 'SELECT * FROM users WHERE username=\'%s\'' % username
+        cursor = self.connection.cursor()
+
+        try:
+            cursor.execute(query)
+
+        except Exception, e:
+            self.debug_InternalError(e)
+            sys.stdout.write(e)
+
+        result = cursor.fetchone()
+        cursor.close()
+
+        if (result == None):
+            return 0
+
+        else:
+            sys.stdout.write("Username exists")
+            return 1
 
     def create_user(self, user):
 
@@ -67,7 +90,7 @@ class Mobile:
 
         msg = jsontree.jsontree()
 
-        if(self.user_found(username) == 1):
+        if(self.user_already_exists(username) == 1):
             msg.status = 0
             msg.message = "username exists !!"
             return json.dumps(msg)

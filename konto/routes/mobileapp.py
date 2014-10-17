@@ -9,6 +9,8 @@ import jsontree, json
 from user import user
 from mobile import mobileApi
 
+from function import functions
+
 configuration = config.config()
 api_key = configuration['API']
 
@@ -17,6 +19,7 @@ con.connect()
 
 user_db = user.User(configuration)
 
+function = functions.Function(api_key)
 @app.route('/mobile', methods=['POST'])
 def mobile_home_page():
     return "Hello Cruel World!!"
@@ -60,12 +63,12 @@ def mobile_user_signup():
         error_msg.message = "Method Not Allowed !!"
         return json.dumps(error_msg)
 
-    user = define_user(request)
+    user = function.define_user_signup(request)
 
     if(user.phone == ''):
         user.phone = None
 
-    error_msg = signup_text_security(user)
+    error_msg = function.signup_text_security(user)
 
     if(error_msg.status == 0):
         return json.dumps(error_msg)
@@ -77,81 +80,6 @@ def mobile_user_signup():
         return json.dumps(c)
     else:
         return json.dumps(c)
-
-def define_user(request):
-
-    user = jsontree.jsontree()
-    user.username = request.form['username']
-    user.password = request.form['password']
-    user.firstname = request.form['firstname']
-    user.lastname = request.form['lastname']
-    user.phone = request.form['phone']
-    user.api = request.headers['Authorization']
-
-    return user
-
-def signup_text_security(text):
-
-    TEXTS = ["SELECT", "UPDATE", "DROP", "MODIFY",
-            "ALTER", "!", "#", "%", "&", "(", ")"]
-
-    username = text.username
-    firstname = text.firstname
-    lastname = text.lastname
-    phone = text.phone
-    password = text.password
-    api = text.api
-
-    error_msg = jsontree.jsontree()
-    error_msg.status = 1
-
-    if(username == ''):
-        error_msg.status = 0
-        error_msg.message = "Username missing"
-        return error_msg
-
-    elif(password == ''):
-        error_msg.status = 0
-        error_msg.message = "Password missing"
-        return error_msg
-
-    elif(firstname == ''):
-        error_msg.status = 0
-        error_msg.message = "Firstname missing"
-        return error_msg
-
-    elif(lastname == ''):
-        error_msg.status = 0
-        error_msg.message = "Lastname is missing"
-        return error_msg
-
-    if(api != api_key):
-        error_msg.status = 0
-        error_msg.message = "You should not be here !!"
-        return error_msg
-
-    for i in TEXTS:
-        if (username.count(i) > 0):
-            error_msg.status = 0
-            error_msg.message = "Restricted text in username"
-            break
-
-        if(firstname.count(i) > 0):
-            error_msg.status = 0
-            error_msg.message = "Restricted text in firstname"
-            break
-
-        if(lastname.count(i) > 0):
-            error_msg.status = 0
-            error_msg.message = "Restricted text in lastname"
-            break
-
-        if(phone.count(i) > 0):
-            error_msg.status = 0
-            error_msg.message = "Restricted text in phone"
-            break
-
-    return error_msg
 
 """
 This route for login
