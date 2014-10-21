@@ -150,6 +150,7 @@ Notification API's
 GET:
     unread: 0
     count: 0
+    last_sync: timestamp
 
 To Return:
     {[
@@ -162,8 +163,17 @@ def get_notification():
     user_id = request.cookies.get('user')
     logged_in = is_logged_in(result, user_id, request.cookies.get('tea'))
 
-    unread = request.form['unread']
-    count = request.form['count']
+    user_input = jsontree.jsontree()
+    user_input.unread = request.form['unread']
+    user_input.count = request.form['count']
+    user_input.last_sync = request.form['last_sync']
 
-    
+    is_valid = function.validate_user_input(user_input)
+
+    if(user_input.unread == 1):
+        notice = con.unread_notification(user_id)
+    else:
+        notice = con.all_notification(user_id, last_sync)
+
+    return notice
 

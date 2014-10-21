@@ -5,7 +5,19 @@ class Function:
     def __init__(self, api_key):
 
         self.api_key = api_key
-        pass
+        self.restricted_text = [
+            "SELECT", 
+            "UPDATE", 
+            "DROP", 
+            "MODIFY",
+            "ALTER", 
+            "!", 
+            "#", 
+            "%", 
+            "&", 
+            "(", 
+            ")"
+        ]
 
     def define_user_signup(self, request):
 
@@ -129,4 +141,22 @@ class Function:
                 error_msg.message = "Restricted text in firstname"
                 break
 
+        return error_msg
+
+    def validate_user_input(self, data):
+
+        """
+        data is jsontree.jsontree
+        should not contain some keywords
+        defined in TEXTS;
+        """
+
+        error_msg = jsontree.jsontree()
+        for one in data:
+            if one.upper() in self.restricted_text:
+                error_msg.status = 0
+                error_msg.message = "Restricted text encountered."
+                return error_msg
+
+        error_msg.status = 1
         return error_msg

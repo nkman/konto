@@ -2,3 +2,4 @@ v
 config/db.json
 *.pyc
 config/db_local.json
+google.json

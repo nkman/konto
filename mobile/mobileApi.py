@@ -333,3 +333,6 @@ class Mobile:
 
         else:
             return 0
+
+    def unread_notification(self, user_id):
+        pass
