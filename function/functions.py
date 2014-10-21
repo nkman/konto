@@ -158,5 +158,10 @@ class Function:
                 error_msg.message = "Restricted text encountered."
                 return error_msg
 
+        if(data.api_key != self.api_key):
+            error_msg.status = 0
+            error_msg.message = "ERROR"
+            return error_msg
+
         error_msg.status = 1
         return error_msg

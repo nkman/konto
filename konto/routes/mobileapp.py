@@ -150,38 +150,61 @@ Notification API's
 GET:
     unread: 0
     count: 0
-    last_sync: timestamp
+    # last_sync: timestamp
 
-To Return:
-    {[
-
-    ]}
 """
 @app.route('/mobile/notification', methods=['POST'])
 def get_notification():
 
+    notice = jsontree.jsontree()
     user_id = request.cookies.get('user')
-    logged_in = is_logged_in(result, user_id, request.cookies.get('tea'))
+
+    logged_in = con.is_logged(user_id, request.cookies.get('tea'))
+    if(logged_in == 0):
+        return self.not_logged_in()
 
     user_input = jsontree.jsontree()
     user_input.unread = request.form['unread']
     user_input.count = request.form['count']
-    user_input.last_sync = request.form['last_sync']
+    # user_input.last_sync = request.form['last_sync']
+    user.api_key = request.headers['Authorization']
 
     is_valid = function.validate_user_input(user_input)
 
     if(is_valid == 0):
         return json.dumps(is_valid)
 
-    notice = jsontree.jsontree()
-
     if(user_input.unread == 1):
         notice.positive = con.positive_notification(user_id, count)
         notice.negetive = con.negetive_notification(user_id, count)
         notice.track = con.tracking_notification(user_id, count)
 
-    else:
-        notice = con.all_notification(user_id, count, last_sync)
+    # else:
+        # notice = con.all_notification(user_id, count, last_sync)
+    notice.status = 1
 
     return notice
 
+@app.route('/mobile/add')
+def add_balance():
+
+    user = jsontree.jsontree()
+    user_id = request.cookies.get('user')
+
+    logged_in = con.is_logged(user_id, request.cookies.get('tea'))
+    if(logged_in == 0):
+        return self.not_logged_in()
+
+    user.fellow_username = request.form['fellow_username']
+    user.amount = request.form['amount']
+    user.mod = request.form['sign']
+
+    c = con.add_balance(user)
+
+    return json.dumps(c)
+
+def not_logged_in():
+    error_msg = jsontree.jsontree()
+    error_msg.status = 0
+    error_msg.message = "NOT_LOGGED_IN"
+    return json.dumps(error_msg)

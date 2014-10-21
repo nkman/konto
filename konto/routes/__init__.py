@@ -204,6 +204,10 @@ def modify():
         return redirect(url_for('home'))
         pass
 
+
+"""
+Just to show add.html
+"""
 @app.route('/add', methods=['GET', 'POST'])
 def add_front():
     user = jsontree.jsontree()
@@ -217,6 +221,10 @@ def add_front():
     _user = json.loads(user_db.user_detail(user.user_id))
     return render_template('add.html', user=_user)
 
+
+"""
+Adding balance here !
+"""
 @app.route('/add/<username>', methods=['GET', 'POST'])
 def add_back(username=None):
     user = jsontree.jsontree()
