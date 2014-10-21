@@ -173,8 +173,13 @@ def get_notification():
     if(is_valid == 0):
         return json.dumps(is_valid)
 
+    notice = jsontree.jsontree()
+
     if(user_input.unread == 1):
-        notice = con.unread_notification(user_id, count)
+        notice.positive = con.positive_notification(user_id, count)
+        notice.negetive = con.negetive_notification(user_id, count)
+        notice.track = con.tracking_notification(user_id, count)
+
     else:
         notice = con.all_notification(user_id, count, last_sync)
 

@@ -339,29 +339,62 @@ class Mobile:
     Functions to return notification:
 
         1. positive_notification:
-        
+
             returns the jsontree data of user_id which contains
             {
                 "positive": [
                     {accoutnId, userId1, userId2, balance},
                     {},
-                    {}
+                    {},
+                    ... (10 max)
                 ], 
                 "name": [
                     {firstname lastname},
-                    {},{}
+                    {},
+                    {},
+                    ... (10 max)
+                ]
+            }
+
+        2. negetive_notification
+
+            returns the jsontree data of user_id as
+            {
+                "negetive": [
+                    {accoutnId, userId1, userId2, balance},
+                    {},
+                    {},
+                    ... (10 max)
+                ], 
+                "name": [
+                    {firstname lastname},
+                    {},
+                    {},
+                    ... (10 max)
+                ]
+            }
+
+        3. tracking_notification
+
+            returns the jsontree data of user_id as
+            {
+                "unread":[
+                    {noticeId, userId, notice},
+                    {},
+                    {},
+                    ... (10 max)
                 ]
             }
     """
+
     def positive_notification(self, user_id, count):
 
         error_msg = jsontree.jsontree()
         notice = jsontree.jsontree()
 
         notice.name = []
-        # name.unread = []
 
-        count = (int)count
+        count = int(count)
         query = """
             SELECT accountId, userId1,
             userId2, balance
@@ -381,6 +414,7 @@ class Mobile:
             notice.positive = cursor.fetchall()
 
         except Exception, e:
+            self.restart_connection()
             error_msg.status = 0
             error_msg.message = str(e)
             return error_msg
@@ -399,26 +433,25 @@ class Mobile:
                 result_name = cursor.fetchone()
 
             except Exception, e:
+                self.restart_connection()
                 error_msg.status = 0
                 error_msg.message = str(e)
-                return json.dumps(error_msg)
+                return error_msg
 
             notice.name.append(result_name[0]+" "+result_name[1])
 
         cursor.close()
-        notice.unread = result
         notice.status = 1
 
         return notice
 
-    def negetive_notice(self, user_id, count):
+    def negetive_notification(self, user_id, count):
 
         error_msg = jsontree.jsontree()
         notice = jsontree.jsontree()
-        name = jsontree.jsontree()
 
-        name.negetive = []
-        count = (int)count
+        notice.name = []
+        count = int(count)
 
         query = """
             SELECT accountId, userId1,
@@ -428,18 +461,19 @@ class Mobile:
             confirmed_by_user2 = \'%s\' LIMIT 10 OFFSET \'%s\'
         """ % (user_id, False, count*10)
 
+        cursor = self.con.cursor()
+
         try:
             cursor.execute(query)
-            result = cursor.fetchall()
+            notice.negetive = cursor.fetchall()
 
         except Exception, e:
+            self.restart_connection()
             error_msg.status = 0
             error_msg.message = str(e)
             return error_msg
 
-        notice.negetive = result
-
-        for res in result:
+        for res in notice.negetive:
 
             query = """
                 SELECT firstname, lastname from address
@@ -451,31 +485,44 @@ class Mobile:
                 result_name = cursor.fetchone()
 
             except Exception, e:
+                self.restart_connection()
                 error_msg.status = 0
                 error_msg.message = str(e)
                 return error_msg
 
-            name.negetive.append(result_name[0]+" "+result_name[1])
+            notice.name.append(result_name[0]+" "+result_name[1])
+
+        cursor.close()
+        notice.status = 1
+
+        return notice
 
     def tracking_notification(self, user_id, count):
+
+        error_msg = jsontree.jsontree()
+        notice = jsontree.jsontree()
+        count = int(count)
 
         query = """
             SELECT noticeId, userId,
             notice FROM notification WHERE
             userId = \'%s\' AND 
-            unread = \'%s\'
-        """ % (user_id, True)
+            unread = \'%s\' LIMIT 10 OFFSET \'%s\'
+        """ % (user_id, True, count)
+
+        cursor = self.con.cursor()
 
         try:
             cursor.execute(query)
-            result = cursor.fetchall()
+            notice.unread = cursor.fetchall()
 
         except Exception, e:
+            self.restart_connection()
             error_msg.status = 0
             error_msg.message = str(e)
             return error_msg
 
         cursor.close()
-        notice.unread = result
-        notice.name = name
         notice.status = 1
+
+        return notice
