@@ -170,10 +170,13 @@ def get_notification():
 
     is_valid = function.validate_user_input(user_input)
 
+    if(is_valid == 0):
+        return json.dumps(is_valid)
+
     if(user_input.unread == 1):
-        notice = con.unread_notification(user_id)
+        notice = con.unread_notification(user_id, count)
     else:
-        notice = con.all_notification(user_id, last_sync)
+        notice = con.all_notification(user_id, count, last_sync)
 
     return notice
 

@@ -334,5 +334,148 @@ class Mobile:
         else:
             return 0
 
-    def unread_notification(self, user_id):
-        pass
+
+    """
+    Functions to return notification:
+
+        1. positive_notification:
+        
+            returns the jsontree data of user_id which contains
+            {
+                "positive": [
+                    {accoutnId, userId1, userId2, balance},
+                    {},
+                    {}
+                ], 
+                "name": [
+                    {firstname lastname},
+                    {},{}
+                ]
+            }
+    """
+    def positive_notification(self, user_id, count):
+
+        error_msg = jsontree.jsontree()
+        notice = jsontree.jsontree()
+
+        notice.name = []
+        # name.unread = []
+
+        count = (int)count
+        query = """
+            SELECT accountId, userId1,
+            userId2, balance
+            FROM account WHERE
+            userId1 = \'%s\' AND 
+            confirmed_by_user1 = \'%s\' LIMIT 10 OFFSET \'%s\'
+        """ % (user_id, False, count*10)
+
+        cursor = self.con.cursor()
+
+        """
+        size of notice.positive will be 10.
+        """
+
+        try:
+            cursor.execute(query)
+            notice.positive = cursor.fetchall()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = str(e)
+            return error_msg
+
+        # notice.positive = result
+
+        for res in notice.positive:
+
+            query = """
+                SELECT firstname, lastname from address
+                WHERE userId = \'%s\'
+            """ % (res[2])
+
+            try:
+                cursor.execute(query)
+                result_name = cursor.fetchone()
+
+            except Exception, e:
+                error_msg.status = 0
+                error_msg.message = str(e)
+                return json.dumps(error_msg)
+
+            notice.name.append(result_name[0]+" "+result_name[1])
+
+        cursor.close()
+        notice.unread = result
+        notice.status = 1
+
+        return notice
+
+    def negetive_notice(self, user_id, count):
+
+        error_msg = jsontree.jsontree()
+        notice = jsontree.jsontree()
+        name = jsontree.jsontree()
+
+        name.negetive = []
+        count = (int)count
+
+        query = """
+            SELECT accountId, userId1,
+            userId2, balance
+            FROM account WHERE
+            userId2 = \'%s\' AND 
+            confirmed_by_user2 = \'%s\' LIMIT 10 OFFSET \'%s\'
+        """ % (user_id, False, count*10)
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchall()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = str(e)
+            return error_msg
+
+        notice.negetive = result
+
+        for res in result:
+
+            query = """
+                SELECT firstname, lastname from address
+                WHERE userId = \'%s\'
+            """ % (res[1])
+
+            try:
+                cursor.execute(query)
+                result_name = cursor.fetchone()
+
+            except Exception, e:
+                error_msg.status = 0
+                error_msg.message = str(e)
+                return error_msg
+
+            name.negetive.append(result_name[0]+" "+result_name[1])
+
+    def tracking_notification(self, user_id, count):
+
+        query = """
+            SELECT noticeId, userId,
+            notice FROM notification WHERE
+            userId = \'%s\' AND 
+            unread = \'%s\'
+        """ % (user_id, True)
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchall()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = str(e)
+            return error_msg
+
+        cursor.close()
+        notice.unread = result
+        notice.name = name
+        notice.status = 1
