@@ -403,7 +403,7 @@ class Mobile:
             confirmed_by_user1 = \'%s\' LIMIT 10 OFFSET \'%s\'
         """ % (user_id, False, count*10)
 
-        cursor = self.con.cursor()
+        cursor = self.connection.cursor()
 
         """
         size of notice.positive will be 10.
@@ -461,7 +461,7 @@ class Mobile:
             confirmed_by_user2 = \'%s\' LIMIT 10 OFFSET \'%s\'
         """ % (user_id, False, count*10)
 
-        cursor = self.con.cursor()
+        cursor = self.connection.cursor()
 
         try:
             cursor.execute(query)
@@ -510,7 +510,7 @@ class Mobile:
             unread = \'%s\' LIMIT 10 OFFSET \'%s\'
         """ % (user_id, True, count)
 
-        cursor = self.con.cursor()
+        cursor = self.connection.cursor()
 
         try:
             cursor.execute(query)
@@ -526,3 +526,82 @@ class Mobile:
         notice.status = 1
 
         return notice
+
+    def create_balance(self, user):
+
+        amount = user.amount
+        mod = user.mod
+
+        if (mod == 'positive'):
+            positive = True
+
+        else:
+            positive = False
+
+        fellow_username = user.fellow_username
+
+        query = """
+            SELECT userId FROM users
+            WHERE username = \'%s\'
+        """ % (fellow_username)
+
+        conn = self.connection
+        cursor = conn.cursor()
+
+        error_msg = jsontree.jsontree()
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchone()
+
+        except Exception, e:
+            self.restart_connection()
+            error_msg.status = 0
+            error_msg.message = str(e)
+            sys.stdout.write(e)
+            return error_msg
+
+        if(result == None):
+            error_msg.status = 0
+            error_msg.message = "USERNAME_NOT_EXIST"
+            return error_msg
+
+        account_id = str(uuid.uuid1())
+        
+        ##TODO:
+        ##If userid1 and userid2 already exists then
+        ##Update table accordingly.
+
+        if(positive):
+            query = """
+                INSERT INTO account (accountId,
+                userId1, userId2, balance, is_positive,
+                confirmed_by_user1, confirmed_by_user2)
+                VALUES (\'%s\', \'%s\', \'%s\', \'%s\', 
+                \'%s\', \'%s\', \'%s\')
+            """ % (account_id, user.user_id, result[0], 
+                amount, True, True, False)
+
+        else:
+            query = """
+                INSERT INTO account (accountId,
+                userId1, userId2, balance, is_positive,
+                confirmed_by_user1, confirmed_by_user2)
+                VALUES (\'%s\', \'%s\', \'%s\', \'%s\', 
+                \'%s\', \'%s\', \'%s\')
+            """ % (account_id, result[0], user.user_id, 
+                amount, True, False, True)
+
+        try:
+            cursor.execute(query)
+            conn.commit()
+
+        except Exception, e:
+            self.restart_connection()
+            error_msg.status = 0
+            error_msg.message = str(e)
+            sys.stdout.write(e)
+            return error_msg
+
+        error_msg.status = 1
+        return error_msg

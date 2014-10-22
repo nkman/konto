@@ -199,6 +199,7 @@ def add_balance():
     user.amount = request.form['amount']
     user.mod = request.form['sign']
 
+    #TODO: define the function below
     c = con.add_balance(user)
 
     return json.dumps(c)
