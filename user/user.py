@@ -394,6 +394,8 @@ class User:
 
     def mark_notification_read(self, notice_id):
 
+        #Modify this query.
+        #only the right user should do this.
         query = """
             UPDATE notification SET
             unread = \'%s\' WHERE

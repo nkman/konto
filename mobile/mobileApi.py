@@ -13,6 +13,8 @@ class Mobile:
         self.password = config['password']
         self.database = config['database']
 
+
+
     def connect(self):
 
         connection = psycopg2.connect(host=self.host, 
@@ -24,10 +26,14 @@ class Mobile:
         self.connection = connection
         return connection
 
+
+
     def restart_connection(self):
         self.connection.close()
         self.connect()
         sys.stdout.write("Restarted the connection !!")
+
+
 
     def verify_user(self, user):
 
@@ -68,6 +74,8 @@ class Mobile:
 
         return error_msg
 
+
+
     def user_already_exists(self, username):
 
         query = 'SELECT * FROM users WHERE username=\'%s\'' % username
@@ -89,6 +97,7 @@ class Mobile:
         else:
             sys.stdout.write("Username exists")
             return 1
+
 
     def create_user(self, user):
 
@@ -144,6 +153,8 @@ class Mobile:
 
         return json.dumps(msg)
 
+
+
     def create_address(self, user, conn):
 
         username = user['username']
@@ -193,8 +204,11 @@ class Mobile:
         cursor.close()
         return msg
 
+
+
     def user_login(self, user_id):
         return self.user_detail(user_id)
+
 
 
     def user_detail(self, user_id):
@@ -222,6 +236,8 @@ class Mobile:
 
         user.status = 1
         return json.dumps(user)
+
+
 
     def firstname_lastname(self, user_id):
 
@@ -252,6 +268,8 @@ class Mobile:
 
         return user
 
+
+
     def username(self, user_id):
         con = self.connection
         user = jsontree.jsontree()
@@ -276,6 +294,8 @@ class Mobile:
         user.username = result[0]
 
         return user
+
+
 
     def set_cookie_to_user(self, user_id):
 
@@ -303,6 +323,8 @@ class Mobile:
             user.status = 0
 
         return user
+
+
 
     def is_logged(self, user_id, user_cookie):
 
@@ -445,6 +467,8 @@ class Mobile:
 
         return notice
 
+
+
     def negetive_notification(self, user_id, count):
 
         error_msg = jsontree.jsontree()
@@ -497,6 +521,8 @@ class Mobile:
 
         return notice
 
+
+
     def tracking_notification(self, user_id, count):
 
         error_msg = jsontree.jsontree()
@@ -526,6 +552,8 @@ class Mobile:
         notice.status = 1
 
         return notice
+
+
 
     def create_balance(self, user):
 
@@ -601,6 +629,243 @@ class Mobile:
             error_msg.status = 0
             error_msg.message = str(e)
             sys.stdout.write(e)
+            return error_msg
+
+        error_msg.status = 1
+        return error_msg
+
+
+
+    def mark_notification_read(self, notice_id, user_id):
+
+        error_msg = jsontree.jsontree()
+        query = """
+            UPDATE notification SET
+            unread = \'%s\' WHERE
+            noticeId = \'%s\' AND userId = \'%s\'
+        """ % (False, notice_id, user_id)
+
+        con = self.connection
+        cursor = con.cursor()
+
+        try:
+            cursor.execute(query)
+            con.commit()
+            cursor.close()
+            error_msg.status = 1
+
+        except Exception, e:
+            self.restart_connection()
+            error_msg.status = 0
+            error_msg.message = str(e)
+
+        return error_msg
+
+
+
+    def mark_accept(self, user):
+
+        error_msg = jsontree.jsontree()
+
+        account_id = user.account_id
+        user_id = user.user_id
+
+        query = """
+            SELECT userId1, userId2 FROM account
+            WHERE accountId = \'%s\'
+        """ % (account_id)
+
+        con = self.connection
+        cursor = con.cursor()
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchone()
+
+        except Exception, e:
+            self.restart_connection()
+            error_msg.status = 0
+            error_msg.message = str(e)
+            return error_msg
+
+        if(result == None):
+            error_msg.status = 0
+            error_msg.message = "Transaction not found."
+            return error_msg
+
+        if(result[0] == user_id):
+
+            userId = result[1]
+            update_db_query = """
+                UPDATE account SET confirmed_by_user1 = \'%s\' WHERE
+                accountId = \'%s\'
+            """ % (True, account_id)
+
+        else:
+
+            userId = result[0]
+            update_db_query = """
+                UPDATE account SET confirmed_by_user2 = \'%s\' WHERE
+                accountId = \'%s\'
+            """ % (True, account_id)
+
+        name = self.firstname_lastname(user_id)
+        notice = name.firstname+" "+name.lastname+" accepted the deal" #Modi--fy this line.
+        date_added = datetime.now()
+        noticeId = str(uuid.uuid1())
+
+        query = """
+            INSERT INTO notification (
+            noticeId, userId, notice, date_added)
+            VALUES (\'%s\', \'%s\', \'%s\', \'%s\')
+        """ % (noticeId, userId, notice, date_added)
+
+        try:
+            cursor.execute(query)
+            con.commit()
+
+        except Exception, e:
+            self.restart_connection()
+            error_msg.status = 0
+            error_msg.message = str(e)
+            return error_msg
+
+        try:
+            cursor.execute(update_db_query)
+            con.commit()
+            cursor.close()
+
+        except Exception, e:
+            self.restart_connection()
+            error_msg.status = 0
+            error_msg.message = str(e)
+            return error_msg
+
+        error_msg.status = 1
+        return error_msg
+
+
+
+    def mark_decline(self, user):
+
+        error_msg = jsontree.jsontree()
+
+        account_id = user.account_id
+        user_id = user.user_id
+
+        query = """
+            SELECT userId1, userId2 FROM account
+            WHERE accountId = \'%s\'
+        """ % (account_id)
+
+        con = self.connection
+        cursor = con.cursor()
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchone()
+
+        except Exception, e:
+            self.restart_connection()
+            error_msg.status = 0
+            error_msg.message = str(e)
+            return error_msg
+
+        if(result == None):
+            error_msg.status = 0
+            error_msg.message = "Transaction not found."
+            return error_msg
+
+        if(result[0] == user_id):
+            userId = result[1]
+        else:
+            userId = result[0]
+
+        update_db_query = """
+                DELETE FROM account WHERE
+                accountId = \'%s\'
+            """ % (account_id)
+
+        name = self.firstname_lastname(user_id)
+        notice = name.firstname+" "+name.lastname+" Deleted the deal" #Modi--fy this line.
+        date_added = datetime.now()
+        noticeId = str(uuid.uuid1())
+
+        query = """
+            INSERT INTO notification (
+            noticeId, userId, notice, date_added)
+            VALUES (\'%s\', \'%s\', \'%s\', \'%s\')
+        """ % (noticeId, userId, notice, date_added)
+
+        try:
+            cursor.execute(query)
+            con.commit()
+
+        except Exception, e:
+            self.restart_connection()
+            error_msg.status = 0
+            error_msg.message = str(e)
+            return error_msg
+
+        try:
+            cursor.execute(update_db_query)
+            con.commit()
+            cursor.close()
+
+        except Exception, e:
+            self.restart_connection()
+            error_msg.status = 0
+            error_msg.message = str(e)
+            return error_msg
+
+        error_msg.status = 1
+        return error_msg
+
+
+
+    def del_user_transaction(self, user):
+
+        error_msg = jsontree.jsontree()
+        account_id = user.account_id
+        user_id = user.user_id
+
+        query = """
+            SELECT userId1 FROM account
+            WHERE accountId = \'%s\'
+        """ % (account_id)
+
+        con = self.connection
+        cursor = con.cursor()
+
+        try:
+            cursor.execute(query)
+            result = cursor.fetchone()
+
+        except Exception, e:
+            self.restart_connection()
+            error_msg.status = 0
+            error_msg.message = str(e)
+            return error_msg
+
+        query = """
+            DELETE FROM account
+            WHERE accountId = \'%s\'
+        """ % (account_id)
+
+        if(result[0] != user_id):
+            error_msg.status = 0
+            error_msg.message = "You do not have right to modify that !!"
+            return error_msg
+
+        try:
+            cursor.execute(query)
+            con.commit()
+            cursor.close()
+
+        except Exception, e:
+            self.restart_connection()
+            error_msg.status = 0
+            error_msg.message = str(e)
             return error_msg
 
         error_msg.status = 1

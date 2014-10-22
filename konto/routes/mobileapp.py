@@ -20,6 +20,11 @@ con.connect()
 user_db = user.User(configuration)
 
 function = functions.Function(api_key)
+
+"""
+NONE OF THESE ROUTES ARE TESTED
+"""
+
 @app.route('/mobile', methods=['POST'])
 def mobile_home_page():
     return "Hello Cruel World!!"
@@ -185,8 +190,109 @@ def get_notification():
 
     return notice
 
-@app.route('/mobile/add')
-def add_balance():
+"""
+mark read
+accept
+decline
+"""
+
+@app.route('/mobile/notification/read', methods=['POST'])
+def mobile_notification_read():
+
+    user_id = request.cookies.get('user')
+
+    logged_in = con.is_logged(user_id, request.cookies.get('tea'))
+    if(logged_in == 0):
+        return self.not_logged_in()
+
+    notice_id = request.form['notice_id']
+    mark_read = con.mark_notification_read(notice_id, user_id)
+
+    return json.dumps(mark_read)
+
+
+
+#worked
+@app.route('/mobile/notification/accept', methods=['POST'])
+def mobile_notification_accept():
+
+    user_id = request.cookies.get('user')
+
+    logged_in = con.is_logged(user_id, request.cookies.get('tea'))
+    if(logged_in == 0):
+        return self.not_logged_in()
+
+    user = jsontree.jsontree()
+
+    user.user_id = user_id
+    user.account_id = request.form['account_id']
+    user.decision = request.form['decision']
+
+    if(user.decision == 'Accept'):
+        ac = con.mark_accept(user)
+    else:
+        ac = {"status": 0, "message": "cannot_recognise_command"}
+
+    return json.dumps(ac)
+
+
+
+#worked
+@app.route('/mobile/notification/decline', methods=['GET', 'POST'])
+def mobile_notification_decline():
+
+    user_id = request.cookies.get('user')
+
+    logged_in = con.is_logged(user_id, request.cookies.get('tea'))
+    if(logged_in == 0):
+        return self.not_logged_in()
+
+    user = jsontree.jsontree()
+
+    user.user_id = user_id
+    user.account_id = request.form['account_id']
+    user.decision = request.form['decision']
+
+    if(user.decision == 'Decline'):
+        ac = con.mark_decline(user)
+    else:
+        ac = {"status": 0, "message": "cannot_recognise_command"}
+
+    return json.dumps(ac)
+
+
+
+
+@app.route('/mobile/notification/delete', methods=['GET', 'POST'])
+def mobile_notification_delete():
+
+    user_id = request.cookies.get('user')
+
+    logged_in = con.is_logged(user_id, request.cookies.get('tea'))
+    if(logged_in == 0):
+        return self.not_logged_in()
+
+    user = jsontree.jsontree()
+
+    user.user_id = user_id
+    user.account_id = request.form['account_id']
+    decision = request.form['mod']
+
+    if(decision == 'Delete'):
+        ac = con.del_user_transaction(user)
+    else:
+        ac = {"status": 0, "message": "cannot_recognise_command"}
+
+    return json.dumps(c)
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
+
+@app.route('/mobile/add', methods=['POST'])
+def mobile_add_balance():
 
     user = jsontree.jsontree()
     user_id = request.cookies.get('user')
@@ -209,3 +315,9 @@ def not_logged_in():
     error_msg.status = 0
     error_msg.message = "NOT_LOGGED_IN"
     return json.dumps(error_msg)
+
+@app.route('/mobile/remove', methods= ['POST'])
+def remove_balance():
+
+
+    pass
