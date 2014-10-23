@@ -1,6 +1,7 @@
 from konto import app
 from flask import Flask, jsonify, request, render_template
 from flask import make_response, url_for, redirect
+from gcm import GCM #Build this
 
 import config
 import uuid
