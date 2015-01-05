@@ -27,7 +27,12 @@ class Function:
         user.firstname = request.get_json().get('firstname', '')
         user.lastname = request.get_json().get('lastname', '')
         user.phone = request.get_json().get('phone', '')
-        user.api = request.headers['Authorization']
+
+        try:
+            user.api = request.headers['Authorization']
+        except Exception, e:
+            user.api = None
+        
 
         return user
 
@@ -97,9 +102,13 @@ class Function:
     def define_user_login(self, request):
 
         user = jsontree.jsontree()
-        user.username = request.form['username']
-        user.password = request.form['password']
-        user.api = request.headers['Authorization']
+        user.username = request.get_json().get('username', '')
+        user.password = request.get_json().get('password', '')
+        
+        try:
+            user.api = request.headers['Authorization']
+        except Exception, e:
+            user.api = None
 
         return user
 
