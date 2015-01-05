@@ -172,8 +172,10 @@ def get_notification():
         return self.not_logged_in()
 
     user_input = jsontree.jsontree()
-    user_input.unread = request.form['unread']
-    user_input.count = request.form['count']
+
+    request.get_json(force=True)
+    user_input.unread = request.get_json().get('unread', '')
+    user_input.count = request.get_json().get('count', '')
     # user_input.last_sync = request.form['last_sync']
     user.api_key = request.headers['Authorization']
 
@@ -191,7 +193,7 @@ def get_notification():
         # notice = con.all_notification(user_id, count, last_sync)
     notice.status = 1
 
-    return notice
+    return json.dumps(notice)
 
 """
 mark read
