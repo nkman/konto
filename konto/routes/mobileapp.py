@@ -124,6 +124,7 @@ send the following:
 @app.route('/mobile/login', methods=['POST'])
 def mobile_user_login():
 
+    request.get_json(force=True)
     user = function.define_user_login(request)
 
     error_msg = function.login_text_security(user)
