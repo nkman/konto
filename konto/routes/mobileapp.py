@@ -308,6 +308,7 @@ def mobile_add_balance():
     user.mod = request.form['sign']
 
     #TODO: define the function below
+    #This function to be added.
     c = con.add_balance(user)
 
     return json.dumps(c)
