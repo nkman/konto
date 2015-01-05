@@ -367,7 +367,6 @@ def getAll():
 def page_not_found(e):
     return render_template('404.html'), 404
 
-
 def not_logged_in():
     error_msg = jsontree.jsontree()
     error_msg.status = 0
