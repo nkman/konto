@@ -27,7 +27,12 @@ class Function:
         user.firstname = request.get_json().get('firstname', '')
         user.lastname = request.get_json().get('lastname', '')
         user.phone = request.get_json().get('phone', '')
-        user.api = request.headers['Authorization']
+
+        try:
+            user.api = request.headers['Authorization']
+        except Exception, e:
+            user.api = None
+        
 
         return user
 
