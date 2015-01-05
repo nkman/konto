@@ -69,6 +69,7 @@ def mobile_user_signup():
         error_msg.message = "Method Not Allowed !!"
         return json.dumps(error_msg)
 
+    request.get_json(force=True)
     user = function.define_user_signup(request)
 
     if(user.phone == ''):

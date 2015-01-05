@@ -22,11 +22,11 @@ class Function:
     def define_user_signup(self, request):
 
         user = jsontree.jsontree()
-        user.username = request.form['username']
-        user.password = request.form['password']
-        user.firstname = request.form['firstname']
-        user.lastname = request.form['lastname']
-        user.phone = request.form['phone']
+        user.username = request.get_json().get('username', '')
+        user.password = request.get_json().get('password', '')
+        user.firstname = request.get_json().get('firstname', '')
+        user.lastname = request.get_json().get('lastname', '')
+        user.phone = request.get_json().get('phone', '')
         user.api = request.headers['Authorization']
 
         return user
@@ -72,7 +72,7 @@ class Function:
             return error_msg
 
         for i in TEXTS:
-            if (username.count(i) > 0):
+            if (username.count(str(i)) > 0):
                 error_msg.status = 0
                 error_msg.message = "Restricted text in username"
                 break
@@ -87,10 +87,10 @@ class Function:
                 error_msg.message = "Restricted text in lastname"
                 break
 
-            if(phone.count(i) > 0):
-                error_msg.status = 0
-                error_msg.message = "Restricted text in phone"
-                break
+            # if(len(phone) > 0 and phone.count(i) > 0):
+            #     error_msg.status = 0
+            #     error_msg.message = "Restricted text in phone"
+            #     break
 
         return error_msg
 
