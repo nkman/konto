@@ -536,7 +536,7 @@ class Mobile:
             unread = \'%s\' LIMIT 10 OFFSET \'%s\'
         """ % (user_id, True, count)
 
-        print query
+        # print query
         cursor = self.connection.cursor()
 
         try:
@@ -855,6 +855,11 @@ class Mobile:
             DELETE FROM account
             WHERE accountId = \'%s\'
         """ % (account_id)
+
+        if(result == None):
+            error_msg.status = 0
+            error_msg.message = "No such transaction exists!!"
+            return error_msg
 
         if(result[0] != user_id):
             error_msg.status = 0

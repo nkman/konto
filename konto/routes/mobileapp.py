@@ -1,7 +1,6 @@
 from konto import app
 from flask import Flask, jsonify, request, render_template
 from flask import make_response, url_for, redirect
-from gcm import GCM #Build this
 
 import config
 import uuid
@@ -19,12 +18,7 @@ con = mobileApi.Mobile(configuration)
 con.connect()
 
 user_db = user.User(configuration)
-
 function = functions.Function(api_key)
-
-"""
-NONE OF THESE ROUTES ARE TESTED
-"""
 
 @app.route('/mobile', methods=['POST'])
 def mobile_home_page():
@@ -59,7 +53,7 @@ or
     message: "REASON_FOR_THIS"
 }
 
-TESTED = 1
+This route has been tested !!
 """
 @app.route('/mobile/signup', methods=['POST'])
 def mobile_user_signup():
@@ -90,11 +84,6 @@ def mobile_user_signup():
         return json.dumps(c)
 
 """
--------------------------------
--------------------------------
-"""
-
-"""
 This route for login
 send the following:
 
@@ -121,7 +110,7 @@ send the following:
         message: "USER_NOT_FOUND"
     }
 
-TESTED = 1
+This route has been tested !!
 """
 @app.route('/mobile/login', methods=['POST'])
 def mobile_user_login():
@@ -153,7 +142,18 @@ def mobile_user_login():
     resp.set_cookie('user', c.user_id)
     return resp
 
-#Tested !
+"""
+This route is to add a transaction
+send the following
+
+{
+    fellow_username: "",
+    amount:,
+    sign:(positive or negetive)
+}
+
+This route has been tested !!
+"""
 @app.route('/mobile/add', methods=['POST'])
 def mobile_add_balance():
 
@@ -176,13 +176,14 @@ def mobile_add_balance():
     return json.dumps(c)
 
 """
-Notification API's
+This route is to get all pending transactions
+send the following
 
-GET:
+{
     unread: 0
-    count: 0
-    # last_sync: timestamp
+}
 
+This route has been tested !!
 """
 @app.route('/mobile/notification', methods=['POST'])
 def get_notification():
@@ -222,11 +223,15 @@ def get_notification():
     return json.dumps(notice)
 
 """
-mark read
-accept
-decline
-"""
+This route is to mark tracked notification as read
+send the following
 
+{
+    notice_id: ""
+}
+
+This route has been tested !!
+"""
 @app.route('/mobile/notification/read', methods=['POST'])
 def mobile_notification_read():
 
@@ -236,14 +241,25 @@ def mobile_notification_read():
     if(logged_in == 0):
         return self.not_logged_in()
 
-    notice_id = request.form['notice_id']
+    request.get_json(force=True)
+    notice_id = request.get_json().get('notice_id', '')
     mark_read = con.mark_notification_read(notice_id, user_id)
 
     return json.dumps(mark_read)
 
 
 
-#worked
+"""
+This route is to accept the deal
+send the following
+
+{
+    account_id: "",
+    decision: "Accept"
+}
+
+This route has been tested !!
+"""
 @app.route('/mobile/notification/accept', methods=['POST'])
 def mobile_notification_accept():
 
@@ -256,8 +272,9 @@ def mobile_notification_accept():
     user = jsontree.jsontree()
 
     user.user_id = user_id
-    user.account_id = request.form['account_id']
-    user.decision = request.form['decision']
+    request.get_json(force=True)
+    user.account_id = request.get_json().get('account_id', '')
+    user.decision = request.get_json().get('decision', '')
 
     if(user.decision == 'Accept'):
         ac = con.mark_accept(user)
@@ -267,8 +284,17 @@ def mobile_notification_accept():
     return json.dumps(ac)
 
 
+"""
+This route is to decline the deal
+send the following
 
-#worked
+{
+    account_id: "",
+    decision: "Decline"
+}
+
+This route has been tested !!
+"""
 @app.route('/mobile/notification/decline', methods=['GET', 'POST'])
 def mobile_notification_decline():
 
@@ -279,10 +305,11 @@ def mobile_notification_decline():
         return self.not_logged_in()
 
     user = jsontree.jsontree()
-
     user.user_id = user_id
-    user.account_id = request.form['account_id']
-    user.decision = request.form['decision']
+
+    request.get_json(force=True)
+    user.account_id = request.get_json().get('account_id', '')
+    user.decision = request.get_json().get('decision', '')
 
     if(user.decision == 'Decline'):
         ac = con.mark_decline(user)
@@ -291,9 +318,17 @@ def mobile_notification_decline():
 
     return json.dumps(ac)
 
+"""
+This route is to delete the transaction
+send the following
 
+{
+    account_id: "",
+    decision: "Delete"
+}
 
-
+This route has been tested !!
+"""
 @app.route('/mobile/notification/delete', methods=['GET', 'POST'])
 def mobile_notification_delete():
 
@@ -306,15 +341,16 @@ def mobile_notification_delete():
     user = jsontree.jsontree()
 
     user.user_id = user_id
-    user.account_id = request.form['account_id']
-    decision = request.form['mod']
+    request.get_json(force=True)
+    user.account_id = request.get_json().get('account_id', '')
+    user.decision = request.get_json().get('decision', '')
 
-    if(decision == 'Delete'):
+    if(user.decision == 'Delete'):
         ac = con.del_user_transaction(user)
     else:
         ac = {"status": 0, "message": "cannot_recognise_command"}
 
-    return json.dumps(c)
+    return json.dumps(ac)
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -329,6 +365,16 @@ def not_logged_in():
 
 @app.route('/mobile/remove', methods= ['POST'])
 def remove_balance():
+    """
+    user_id = request.cookies.get('user')
 
+    logged_in = con.is_logged(user_id, request.cookies.get('tea'))
+    if(logged_in == 0):
+        return self.not_logged_in()
+
+    user = jsontree.jsontree()
+    user.account_id = request.form['account_id']
+    decision = request.form['mod']
+    """
 
     pass
