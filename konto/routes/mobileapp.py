@@ -59,6 +59,7 @@ or
     message: "REASON_FOR_THIS"
 }
 
+TESTED = 1
 """
 @app.route('/mobile/signup', methods=['POST'])
 def mobile_user_signup():
@@ -120,6 +121,7 @@ send the following:
         message: "USER_NOT_FOUND"
     }
 
+TESTED = 1
 """
 @app.route('/mobile/login', methods=['POST'])
 def mobile_user_login():
@@ -151,6 +153,27 @@ def mobile_user_login():
     resp.set_cookie('user', c.user_id)
     return resp
 
+#Tested !
+@app.route('/mobile/add', methods=['POST'])
+def mobile_add_balance():
+
+    user = jsontree.jsontree()
+    user_id = request.cookies.get('user')
+
+    logged_in = con.is_logged(user_id, request.cookies.get('tea'))
+    if(logged_in == 0):
+        return self.not_logged_in()
+
+    request.get_json(force=True)
+    user.fellow_username = request.get_json().get('fellow_username', '')
+    user.amount = request.get_json().get('amount', '')
+    user.mod = request.get_json().get('sign', '')
+    user.user_id = user_id
+
+    #TODO: define the function below
+    c = con.create_balance(user)
+
+    return json.dumps(c)
 
 """
 Notification API's
@@ -184,10 +207,13 @@ def get_notification():
     if(is_valid == 0):
         return json.dumps(is_valid)
 
+    #lets
+    user_input.count = 0
+
     if(user_input.unread == 1):
-        notice.positive = con.positive_notification(user_id, count)
-        notice.negetive = con.negetive_notification(user_id, count)
-        notice.track = con.tracking_notification(user_id, count)
+        notice.positive = con.positive_notification(user_id, user_input.count)
+        notice.negetive = con.negetive_notification(user_id, user_input.count)
+        notice.track = con.tracking_notification(user_id, user_input.count)
 
     # else:
         # notice = con.all_notification(user_id, count, last_sync)
@@ -294,26 +320,6 @@ def mobile_notification_delete():
 def page_not_found(e):
     return render_template('404.html'), 404
 
-
-
-@app.route('/mobile/add', methods=['POST'])
-def mobile_add_balance():
-
-    user = jsontree.jsontree()
-    user_id = request.cookies.get('user')
-
-    logged_in = con.is_logged(user_id, request.cookies.get('tea'))
-    if(logged_in == 0):
-        return self.not_logged_in()
-
-    user.fellow_username = request.form['fellow_username']
-    user.amount = request.form['amount']
-    user.mod = request.form['sign']
-
-    #TODO: define the function below
-    c = con.add_balance(user)
-
-    return json.dumps(c)
 
 def not_logged_in():
     error_msg = jsontree.jsontree()
