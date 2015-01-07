@@ -416,7 +416,7 @@ class Mobile:
 
         notice.name = []
 
-        count = int(count)
+        # count = int(count)
         query = """
             SELECT accountId, userId1,
             userId2, balance
@@ -475,7 +475,7 @@ class Mobile:
         notice = jsontree.jsontree()
 
         notice.name = []
-        count = int(count)
+        # count = int(count)
 
         query = """
             SELECT accountId, userId1,
@@ -527,7 +527,7 @@ class Mobile:
 
         error_msg = jsontree.jsontree()
         notice = jsontree.jsontree()
-        count = int(count)
+        # count = int(count)
 
         query = """
             SELECT noticeId, userId,
@@ -536,6 +536,7 @@ class Mobile:
             unread = \'%s\' LIMIT 10 OFFSET \'%s\'
         """ % (user_id, True, count)
 
+        # print query
         cursor = self.connection.cursor()
 
         try:
@@ -589,6 +590,8 @@ class Mobile:
             sys.stdout.write(e)
             return error_msg
 
+        # print result
+
         if(result == None):
             error_msg.status = 0
             error_msg.message = "USERNAME_NOT_EXIST"
@@ -620,6 +623,7 @@ class Mobile:
             """ % (account_id, result[0], user.user_id, 
                 amount, True, False, True)
 
+        print query
         try:
             cursor.execute(query)
             conn.commit()
@@ -628,7 +632,7 @@ class Mobile:
             self.restart_connection()
             error_msg.status = 0
             error_msg.message = str(e)
-            sys.stdout.write(e)
+            sys.stdout.write(str(e))
             return error_msg
 
         error_msg.status = 1
@@ -851,6 +855,11 @@ class Mobile:
             DELETE FROM account
             WHERE accountId = \'%s\'
         """ % (account_id)
+
+        if(result == None):
+            error_msg.status = 0
+            error_msg.message = "No such transaction exists!!"
+            return error_msg
 
         if(result[0] != user_id):
             error_msg.status = 0
