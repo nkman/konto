@@ -162,7 +162,7 @@ def mobile_add_balance():
 
     logged_in = con.is_logged(user_id, request.cookies.get('tea'))
     if(logged_in == 0):
-        return self.not_logged_in()
+        return not_logged_in()
 
     request.get_json(force=True)
     user.fellow_username = request.get_json().get('fellow_username', '')
@@ -193,7 +193,7 @@ def get_notification():
 
     logged_in = con.is_logged(user_id, request.cookies.get('tea'))
     if(logged_in == 0):
-        return self.not_logged_in()
+        return not_logged_in()
 
     user_input = jsontree.jsontree()
 
@@ -239,7 +239,7 @@ def mobile_notification_read():
 
     logged_in = con.is_logged(user_id, request.cookies.get('tea'))
     if(logged_in == 0):
-        return self.not_logged_in()
+        return not_logged_in()
 
     request.get_json(force=True)
     notice_id = request.get_json().get('notice_id', '')
@@ -267,7 +267,7 @@ def mobile_notification_accept():
 
     logged_in = con.is_logged(user_id, request.cookies.get('tea'))
     if(logged_in == 0):
-        return self.not_logged_in()
+        return not_logged_in()
 
     user = jsontree.jsontree()
 
@@ -302,7 +302,7 @@ def mobile_notification_decline():
 
     logged_in = con.is_logged(user_id, request.cookies.get('tea'))
     if(logged_in == 0):
-        return self.not_logged_in()
+        return not_logged_in()
 
     user = jsontree.jsontree()
     user.user_id = user_id
@@ -336,7 +336,7 @@ def mobile_notification_delete():
 
     logged_in = con.is_logged(user_id, request.cookies.get('tea'))
     if(logged_in == 0):
-        return self.not_logged_in()
+        return not_logged_in()
 
     user = jsontree.jsontree()
 
@@ -351,6 +351,17 @@ def mobile_notification_delete():
         ac = {"status": 0, "message": "cannot_recognise_command"}
 
     return json.dumps(ac)
+
+@app.route('/mobile/getall', methods=['POST'])
+def getAll():
+
+    user_id = request.cookies.get('user')
+
+    logged_in = con.is_logged(user_id, request.cookies.get('tea'))
+    if(logged_in == 0):
+        return not_logged_in()
+
+    return con.user_account_detail(user_id)
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -370,7 +381,7 @@ def remove_balance():
 
     logged_in = con.is_logged(user_id, request.cookies.get('tea'))
     if(logged_in == 0):
-        return self.not_logged_in()
+        return not_logged_in()
 
     user = jsontree.jsontree()
     user.account_id = request.form['account_id']

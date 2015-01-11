@@ -879,3 +879,68 @@ class Mobile:
 
         error_msg.status = 1
         return error_msg
+
+    def user_account_detail(self, user_id):
+
+        error_msg = jsontree.jsontree()
+        account_detail = jsontree.jsontree()
+
+        query = """
+            SELECT accountId, userId1, userId2, balance
+            FROM account
+            WHERE userId1 = \'%s\' AND
+            confirmed_by_user1 = True AND 
+            confirmed_by_user2 = True
+        """ % (user_id)
+
+        cursor = self.connection.cursor()
+
+        try:
+            cursor.execute(query)
+            result1 = cursor.fetchall()
+            print result1
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = str(e)
+            sys.stdout.write('USER PHASE I')
+            return json.dumps(error_msg)
+
+        query = """
+            SELECT accountId, userId1, userId2, balance
+            FROM account
+            WHERE userId2 = \'%s\' AND
+            confirmed_by_user1 = True AND 
+            confirmed_by_user2 = True
+        """ % (user_id)
+
+        try:
+            cursor.execute(query)
+            result2 = cursor.fetchall()
+            cursor.close()
+
+        except Exception, e:
+            error_msg.status = 0
+            error_msg.message = str(e)
+            sys.stdout.write('USER PHASE II')
+            return json.dumps(error_msg)
+
+        account_detail.current_balance = 0
+        account_detail.positive_name = []
+        account_detail.negetive_name = []
+
+        for acc in result1:
+            account_detail.current_balance += int(acc[3])
+            name = self.firstname_lastname(acc[2])
+            account_detail.positive_name.append(name.firstname+" "+name.lastname)
+
+        for acc in result2:
+            account_detail.current_balance -= int(acc[3])
+            name = self.firstname_lastname(acc[1])
+            account_detail.negetive_name.append(name.firstname+" "+name.lastname)
+
+        account_detail.status = 1
+        account_detail.positive = result1
+        account_detail.negetive = result2
+
+        return json.dumps(account_detail)
